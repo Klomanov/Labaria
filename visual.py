@@ -8,7 +8,7 @@ class Drawer:
     def update(self, figures, ui):
         self.screen.fill((0, 0, 0))
         for figure in figures:
-            figure.drawOn(self.screen)
+            figure.draw_on(self.screen)
         if ui is not None:
             ui.blit()
             ui.update()
@@ -16,8 +16,5 @@ class Drawer:
 
 
 class DrawableObject:
-    def __init__(self):
-        pass
-
     def draw_on(self, surface):
         pass

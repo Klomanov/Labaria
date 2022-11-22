@@ -1,5 +1,8 @@
 import pygame as pg
+
+import constants
 import visual
+from block import *
 
 
 def main():
