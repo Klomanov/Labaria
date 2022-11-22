@@ -5,10 +5,11 @@ class Drawer:
     def __init__(self, screen):
         self.screen = screen
 
-    def update(self, figures, ui):
+    def update(self, world, ui):
         self.screen.fill((0, 0, 0))
-        for figure in figures:
-            figure.drawOn(self.screen)
+        for row in world:
+            for block in row:
+                block.draw_on(self.screen)
         if ui is not None:
             ui.blit()
             ui.update()
@@ -16,8 +17,5 @@ class Drawer:
 
 
 class DrawableObject:
-    def __init__(self):
-        pass
-
     def draw_on(self, surface):
         pass
