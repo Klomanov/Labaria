@@ -51,12 +51,13 @@ def main():
                 elif event.key == pygame.K_d:
                     world_move_left(world)
                     bottom_down = "d"
-            elif bottom_down == "a":
-                world_move_right(world)
-            elif bottom_down == "d":
-                world_move_left(world)
             elif event.type == pygame.KEYUP:
                 bottom_down = None
+        if bottom_down == "a":
+            world_move_right(world)
+        elif bottom_down == "d":
+            world_move_left(world)
+
         drawer.display_world(world)
 
 
