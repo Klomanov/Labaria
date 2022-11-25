@@ -33,7 +33,7 @@ def main():
 
     pg.init()
     finished = False
-    bottom_down = None
+    bottom_down = None  #переменная для движения с зажатой кнопкой
     screen = pg.display.set_mode((width, height))
     drawer = visual.Drawer(screen)
     clock = pg.time.Clock()
