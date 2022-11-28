@@ -29,6 +29,8 @@ def init_world():
     return world
 
 
+
+
 def main():
 
     pg.init()
@@ -39,16 +41,11 @@ def main():
     world = init_world()
 
     while not finished:
-        keys = pygame.key.get_pressed()
         clock.tick(60)
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 finished = True
-        if keys[pygame.K_a]:
-            world_move_right(world)
-        elif keys[pygame.K_d]:
-            world_move_left(world)
-
+        world_move_general(world)
         drawer.display_world(world)
 
 
