@@ -3,7 +3,7 @@ import pygame as pg
 import visual
 from block import *
 from constants import *
-from world_move import *
+from world import *
 from hero import *
 
 
