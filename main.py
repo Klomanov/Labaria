@@ -3,7 +3,8 @@ import pygame as pg
 import visual
 from block import *
 from constants import *
-from  world_move import *
+from world_move import *
+from hero import *
 
 
 def init_world():
@@ -30,35 +31,35 @@ def init_world():
 
 
 def main():
-
     pg.init()
     finished = False
-    bottom_down = None  #переменная для движения с зажатой кнопкой
     screen = pg.display.set_mode((width, height))
     drawer = visual.Drawer(screen)
     clock = pg.time.Clock()
     world = init_world()
+    hero = Hero(screen)
 
     while not finished:
         clock.tick(60)
+        world_move_general(world)
+        drawer.display_world(world)
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 finished = True
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
-                    bottom_down = "a"
-                    world_move_right(world)
-                elif event.key == pygame.K_d:
-                    world_move_left(world)
-                    bottom_down = "d"
-            elif event.type == pygame.KEYUP:
-                bottom_down = None
-        if bottom_down == "a":
-            world_move_right(world)
-        elif bottom_down == "d":
-            world_move_left(world)
 
-        drawer.display_world(world)
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a]:
+            world_move_right(world)
+            hero.draw_hero('a', sky_level)
+        elif keys[pygame.K_d]:
+            world_move_left(world)
+            hero.draw_hero('d', sky_level)
+        elif jump:
+            hero.draw_hero('j', sky_level)
+        else:
+            hero.static(sky_level)
+
+        pg.display.update()
 
 
 if __name__ == "__main__":
