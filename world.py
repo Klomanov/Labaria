@@ -34,7 +34,7 @@ def init_world(seed=-1):
     for y in range(world_size_y):
         ground_level_noise.append([])
         for x in range(world_size_x):
-            value = noise1([x / world_size_x, y / world_size_y]) + 0.7*noise2([x / world_size_x, y / world_size_y])
+            value = noise1([x / world_size_x, y / world_size_y]) + 0.8*noise2([x / world_size_x, y / world_size_y])
             ground_level_noise[y].append(value)
 
     plt.imshow(ground_level_noise, cmap='gray')
@@ -46,7 +46,6 @@ def init_world(seed=-1):
         world[y][x] = Block(world[y][x].x, world[y][x].y, BlockType.grass)
         for ny in range(y+1, world_size_y):
             world[ny][x] = Block(world[ny][x].x, world[ny][x].y, BlockType.dirt)
-
 
     return world
 
