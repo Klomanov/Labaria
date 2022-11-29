@@ -3,7 +3,8 @@ import pygame as pg
 import visual
 from block import *
 from constants import *
-from world_move import *
+from world import *
+from physics_process import *
 
 
 def init_world():
@@ -29,6 +30,20 @@ def init_world():
     return world
 
 
+def world_move_general(world, physics_process):
+    """Функция, которая осуществляет движение мира с помощью других функций в world_move.py"""
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_a]:
+        physics_process.world_movement_speed_x = world_move_right(world)
+    elif keys[pygame.K_d]:
+        physics_process.world_movement_speed_x = world_move_left(world)
+    else:
+        physics_process.world_movement_speed_x = 0
+    if keys[pygame.K_SPACE]:
+        if check_block(world):
+            physics_process.world_movement_speed_y = world_jump()
+
+
 
 
 def main():
@@ -37,6 +52,7 @@ def main():
     finished = False
     screen = pg.display.set_mode((width, height))
     drawer = visual.Drawer(screen)
+    physic_process = Physic_process(gravconst)
     clock = pg.time.Clock()
     world = init_world()
 
@@ -45,7 +61,9 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 finished = True
-        world_move_general(world)
+        world_move_general(world, physic_process)
+        physic_process.world_move(world)
+        physic_process.gravitation(world)
         drawer.display_world(world)
 
 
