@@ -5,11 +5,18 @@ class Drawer:
     def __init__(self, screen):
         self.screen = screen
 
-    def display_world(self, world):
+    def update_screen(self, world, hero):
+        """
+        Рисует все объекты на экране и обновляет его
+        :param world:
+        :param hero:
+        :return:
+        """
         self.screen.fill((0, 0, 0))
         for row in world:
             for block in row:
                 block.draw_on(self.screen)
+        hero.draw_on(self.screen)
         pg.display.update()
 
 

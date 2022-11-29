@@ -1,34 +1,35 @@
 import pygame as pg
-import constants
+from constants import *
+import visual
 
 
-class Hero():
-    def __init__(self, screen):
-        self.screen = screen
+class Hero(visual.DrawableObject):
+    def __init__(self):
         self.animCount = 0
+        self.y = sky_level
+        self.anim_type = AnimationType.static
 
-    def static(self, position):
-        self.screen.blit(constants.playerStand, (constants.width / 2,
-                         constants.height - (position + 1) * constants.block_size))
+    def set_animation(self, anim):
+        self.anim_type = anim
 
-    def draw_hero(self, event, position):
+    def draw_on(self, screen):
         if self.animCount + 1 >= 35:
             self.animCount = 0
 
-        if event == 'a':
-            self.screen.blit(constants.animLeft[self.animCount // 5], (constants.width / 2,
-                             constants.height - (position + 1)*constants.block_size))
+        if self.anim_type == AnimationType.left:
+            screen.blit(animLeft[self.animCount // 5], (width / 2,
+                                                        height - (
+                                                                self.y + 1) * block_size))
             self.animCount += 1
-        elif event == 'd':
-            self.screen.blit(constants.animRight[self.animCount // 5], (constants.width / 2,
-                             constants.height - (position + 1) * constants.block_size))
+        elif self.anim_type == AnimationType.right:
+            screen.blit(animRight[self.animCount // 5], (width / 2,
+                                                         height - (
+                                                                 self.y + 1) * block_size))
             self.animCount += 1
-        elif event == 'j':
-            self.screen.blit(constants.playerJumped, (constants.width / 2,
-                             constants.height - (position + 1) * constants.block_size))
+        elif self.anim_type == AnimationType.jump:
+            screen.blit(playerJumped, (width / 2,
+                                       height - (self.y + 1) * block_size))
 
-
-
-
-
-
+        elif self.anim_type == AnimationType.static:
+            screen.blit(playerStand, (width / 2,
+                                      height - (self.y + 1) * block_size))
