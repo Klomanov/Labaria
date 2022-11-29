@@ -6,7 +6,8 @@ width = 1200
 
 world_size_x = width // block_size + 5  # Ширина карты мира
 world_size_y = height // block_size + 5  # Высота карты мира
-sky_level = world_size_y // 2  # Уровень неба
+sky_level = world_size_y - world_size_y // 3  # Уровень неба
+perlin_octaves = 2
 
 
 class BlockType:
