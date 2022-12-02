@@ -23,8 +23,7 @@ class Physic_process:
             for block in row:
                 block.y -= self.world_movement_speed_y
                 block.x += self.world_movement_speed_x
-#                if self.world_movement_speed_x < 0:
-#                    if not check_block_left_lower(world):
+
 
 
 
