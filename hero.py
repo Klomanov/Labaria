@@ -17,19 +17,18 @@ class Hero(visual.DrawableObject):
             self.animCount = 0
 
         if self.anim_type == AnimationType.left:
-            screen.blit(animLeft[self.animCount // 5], (width / 2,
-                                                        height - (
-                                                                self.y + 1) * block_size))
+            screen.blit(animLeft[self.animCount // 5], (width / 2 - 30,
+                                                        height/2 - 135))#числа подогнаны так,чтобы персонаж был примерно в центре
             self.animCount += 1
         elif self.anim_type == AnimationType.right:
-            screen.blit(animRight[self.animCount // 5], (width / 2,
-                                                         height - (
-                                                                 self.y + 1) * block_size))
+            screen.blit(animRight[self.animCount // 5], (width / 2 - 30,
+                                                         height/2 - 135)) #числа подогнаны так,чтобы персонаж был примерно в центре
             self.animCount += 1
         elif self.anim_type == AnimationType.jump:
-            screen.blit(playerJumped, (width / 2,
-                                       height - (self.y + 1) * block_size))
+            screen.blit(playerJumped, (width / 2 - 30,
+                                       height/2 - 135))#числа подогнаны так,чтобы персонаж был примерно в центре
 
         elif self.anim_type == AnimationType.static:
-            screen.blit(playerStand, (width / 2,
-                                      height - (self.y + 1) * block_size))
+            screen.blit(playerStand, (width / 2 - 30,
+                                      height/2 - 135))#числа подогнаны так,чтобы персонаж был примерно в центре
+# height - (self.y + 1) * block_size

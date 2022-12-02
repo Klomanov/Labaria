@@ -5,6 +5,21 @@ from block import *
 from constants import *
 from world import *
 from hero import *
+from physics_process import *
+
+
+def world_move_general(world, physics_process, hero):
+    """Функция, которая осуществляет движение мира с помощью других функций в world_move.py"""
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_a]:
+        physics_process.world_movement_speed_x = 1.75
+    elif keys[pygame.K_d]:
+        physics_process.world_movement_speed_x = -1.75
+    else:
+        physics_process.world_movement_speed_x = 0
+    if keys[pygame.K_SPACE]:
+        if check_block(world):
+            physics_process.world_movement_speed_y = -7.5
 
 
 def main():
@@ -12,30 +27,27 @@ def main():
     finished = False
     screen = pg.display.set_mode((width, height))
     drawer = visual.Drawer(screen)
+    physic_process = Physic_process(gravconst)
     clock = pg.time.Clock()
     world = init_world()
     hero = Hero()
 
     while not finished:
-
         clock.tick(60)
-        world_move_general(world)
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 finished = True
-
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_a]:
-            world_move_right(world)
-            hero.set_animation(AnimationType.left)
-        elif keys[pygame.K_d]:
-            world_move_left(world)
-            hero.set_animation(AnimationType.right)
-        elif jump:
+        physic_process.world_move(world)
+        physic_process.gravitation(world)
+        world_move_general(world, physic_process, hero)
+        if physic_process.world_movement_speed_y != 0:
             hero.set_animation(AnimationType.jump)
         else:
             hero.set_animation(AnimationType.static)
-
+        if physic_process.world_movement_speed_x > 0:
+            hero.set_animation(AnimationType.left)
+        if physic_process.world_movement_speed_x < 0:
+            hero.set_animation(AnimationType.right)
         drawer.update_screen(world, hero)
 
 
