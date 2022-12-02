@@ -44,33 +44,16 @@ def init_world(seed=-1):
         world[y][x] = Block(world[y][x].x, world[y][x].y, BlockType.grass)
         for ny in range(y+1, world_size_y):
             world[ny][x] = Block(world[ny][x].x, world[ny][x].y, BlockType.dirt)
-
     return world
-
-
-def world_move_left():
-    """Движение мира влево, использовать при движении игрока вправо"""
-    v_x = -1.75
-    return v_x
-
-
-def world_move_right():
-    """Движение мира влево, использовать при движении игрока вправо"""
-    v_x = 1.75
-    return v_x
-
-
-def world_jump():
-    """Функция, которая осуществляет прыжок"""
-    v_y = -7.5
-    return v_y
 
 
 def check_block(world):
     """Проверяет блок под центром мира"""
     for row in world:
-        for block in row:
-            if (block.x <= width/2 + 15) and (block.x >= width/2 - 15) and (block.y <= height/2 + 15) and (block.y >= height/2 - 15):
-                return block.collidable
+        if (row[0].y - height/2)**2 <= (block_size/2)**2:
+            for block in row:
+                if (block.x - width/2)**2 <= (block_size/2)**2:
+                    return block.collidable
+
 
 

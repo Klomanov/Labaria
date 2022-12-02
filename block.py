@@ -11,6 +11,7 @@ class Block(visual.DrawableObject):
         self.type = type
         self.collidable = block_collisions.get(type)
 
+
     def draw_on(self, surface):
         block_surf = block_images[self.type]
         block_surf = pg.transform.scale(block_surf, (block_size, block_size))
