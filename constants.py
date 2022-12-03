@@ -45,7 +45,8 @@ class Animations:
              pg.transform.scale(pg.image.load("animation/character_male_right_walk5.png"), (hero_width, hero_height)),
              pg.transform.scale(pg.image.load("animation/character_male_right_walk6.png"), (hero_width, hero_height)),
              pg.transform.scale(pg.image.load("animation/character_male_right_walk7.png"), (hero_width, hero_height))]
-    jump = [pg.transform.scale(pg.image.load("animation/character_maleAdventurer_jump.png"), (hero_width, hero_height))]
+    jump_right = [pg.transform.scale(pg.image.load("animation/character_male_right_jump.png"), (hero_width, hero_height))]
+    jump_left = [pg.transform.scale(pg.image.load("animation/character_male_left_jump.png"), (hero_width, hero_height))]
     static = [pg.transform.scale(pg.image.load("animation/character_male_idle.png"), (hero_width, hero_height))]
 
 

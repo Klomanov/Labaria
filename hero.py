@@ -14,8 +14,10 @@ class Hero(visual.DrawableObject):
         self.rect = self.image.get_rect(center=(self.x, self.y))
 
     def set_animation(self, vx):
-        if self.falling:
-            self.animation = Animations.jump
+        if self.falling and vx > 0:
+            self.animation = Animations.jump_left
+        elif self.falling and vx < 0:
+            self.animation = Animations.jump_right
         elif vx > 0:
             self.animation = Animations.left
         elif vx < 0:
@@ -27,7 +29,7 @@ class Hero(visual.DrawableObject):
         if self.animCount + 1 >= 35:
             self.animCount = 0
 
-        if self.animation == Animations.static or self.animation == Animations.jump:
+        if self.animation == Animations.static or self.animation == Animations.jump_left or self.animation == Animations.jump_right:
             self.image = self.animation[0]
         else:
             self.image = self.animation[self.animCount // 5]
