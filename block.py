@@ -10,12 +10,10 @@ class Block(visual.DrawableObject):
         self.size = size
         self.type = type
         self.collidable = block_collisions.get(type)
-
+        self.image = pg.transform.scale(block_images[self.type], (block_size, block_size))
+        self.rect = self.image.get_rect(center=(self.x, self.y))
 
     def draw_on(self, surface):
-        block_surf = block_images[self.type]
-        block_surf = pg.transform.scale(block_surf, (block_size, block_size))
-        block_rect = block_surf.get_rect(
-            center=(self.x, self.y))
-        surface.blit(block_surf, block_rect)
+        self.rect = self.image.get_rect(center=(self.x, self.y))
+        surface.blit(self.image, self.rect)
 

@@ -5,51 +5,57 @@ from block import *
 from constants import *
 from world import *
 from hero import *
-from physics_process import *
 
 
-def world_move_general(world, physics_process, hero):
-    """Функция, которая осуществляет движение мира с помощью других функций в world_move.py"""
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_a]:
-        physics_process.world_movement_speed_x = 1.75
-    elif keys[pygame.K_d]:
-        physics_process.world_movement_speed_x = -1.75
-    else:
-        physics_process.world_movement_speed_x = 0
-    if keys[pygame.K_SPACE]:
-        if check_block(world):
-            physics_process.world_movement_speed_y = -7.5
+class Game:
+    def __init__(self):
+        pg.init()
+        self.finished = False
+        self.screen = pg.display.set_mode((width, height))
+        self.drawer = visual.Drawer(self.screen)
+        self.world = World(-1)
+        spawn_block = self.world.get_block(hero_spawn_x, hero_spawn_y)
+        self.hero = Hero(spawn_block.x, spawn_block.y)
+        self.clock = pg.time.Clock()
 
+    def world_move_general(self, keys):
 
-def main():
-    pg.init()
-    finished = False
-    screen = pg.display.set_mode((width, height))
-    drawer = visual.Drawer(screen)
-    physic_process = Physic_process(gravconst)
-    clock = pg.time.Clock()
-    world = init_world()
-    hero = Hero()
+        """Функция, которая осуществляет движение мира с помощью других функций в world.py"""
 
-    while not finished:
-        clock.tick(60)
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                finished = True
-        physic_process.world_move(world)
-        physic_process.gravitation(world)
-        world_move_general(world, physic_process, hero)
-        if physic_process.world_movement_speed_y != 0:
-            hero.set_animation(AnimationType.jump)
+        if keys[pygame.K_a] and not self.world.will_collide_with_rect(hero_speed, 0, self.hero.rect):
+            self.world.vx = hero_speed
+        elif keys[pygame.K_d] and not self.world.will_collide_with_rect(-hero_speed, 0, self.hero.rect):
+            self.world.vx = -hero_speed
         else:
-            hero.set_animation(AnimationType.static)
-        if physic_process.world_movement_speed_x > 0:
-            hero.set_animation(AnimationType.left)
-        if physic_process.world_movement_speed_x < 0:
-            hero.set_animation(AnimationType.right)
-        drawer.update_screen(world, hero)
+            self.world.vx = 0
+
+        if not self.world.will_collide_with_rect(0, self.world.vy-g, self.hero.rect):
+            self.world.vy -= g
+            self.hero.falling = True
+        elif keys[pygame.K_SPACE]:
+            self.world.vy = hero_jump_power
+            self.hero.falling = True
+        else:
+            self.world.vy = 0
+            self.hero.falling = False
+
+        self.hero.set_animation(self.world.vx)
+        self.world.move()
+
+    def event_handler(self):
+        """Функция-обработчик нажатий клавиш"""
+        keys = pygame.key.get_pressed()
+        self.world_move_general(keys)
+
+    def run(self):
+        while not self.finished:
+            self.clock.tick(60)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    self.finished = True
+            self.event_handler()
+            self.drawer.update_screen(self.world.map, self.hero)
 
 
 if __name__ == "__main__":
-    main()
+    Game().run()
