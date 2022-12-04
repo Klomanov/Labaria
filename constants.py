@@ -57,3 +57,6 @@ block_images = {BlockType.grass: pg.image.load("textures/tile_grass.jpg"),
 block_collisions = {BlockType.grass: True,
                     BlockType.dirt: True,
                     BlockType.sky: False}
+
+
+start_img = pg.image.load("menu/buttonStart.png")
