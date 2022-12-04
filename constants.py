@@ -48,22 +48,22 @@ class Animations:
     jump_right = [pg.transform.scale(pg.image.load("animation/character_male_right_jump.png"), (hero_width, hero_height))]
     jump_left = [pg.transform.scale(pg.image.load("animation/character_male_left_jump.png"), (hero_width, hero_height))]
     static = [pg.transform.scale(pg.image.load("animation/character_male_idle.png"), (hero_width, hero_height))]
-    break_right = [pg.transform.scale(pg.image.load("animation/character_male_kick1.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_kick1.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_kick2.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_kick2.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_kick3.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_kick3.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_kick4.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_kick4.png"), (hero_width, hero_height))]
-    break_left = [pg.transform.scale(pg.image.load("animation/character_male_kick1.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_kick1.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_kick2.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_kick2.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_kick3.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_kick3.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_kick4.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_kick4.png"), (hero_width, hero_height))]
+    break_right = [pg.transform.scale(pg.image.load("animation/character_male_right_kick1.png"), (hero_width, hero_height)),
+                   pg.transform.scale(pg.image.load("animation/character_male_right_kick1.png"), (hero_width, hero_height)),
+                   pg.transform.scale(pg.image.load("animation/character_male_right_kick2.png"), (hero_width, hero_height)),
+                   pg.transform.scale(pg.image.load("animation/character_male_right_kick2.png"), (hero_width, hero_height)),
+                   pg.transform.scale(pg.image.load("animation/character_male_right_kick3.png"), (hero_width, hero_height)),
+                   pg.transform.scale(pg.image.load("animation/character_male_right_kick3.png"), (hero_width, hero_height)),
+                   pg.transform.scale(pg.image.load("animation/character_male_right_kick4.png"), (hero_width, hero_height)),
+                   pg.transform.scale(pg.image.load("animation/character_male_right_kick4.png"), (hero_width, hero_height))]
+    break_left = [pg.transform.scale(pg.image.load("animation/character_male_left_kick1.png"), (hero_width, hero_height)),
+                  pg.transform.scale(pg.image.load("animation/character_male_left_kick1.png"), (hero_width, hero_height)),
+                  pg.transform.scale(pg.image.load("animation/character_male_left_kick2.png"), (hero_width, hero_height)),
+                  pg.transform.scale(pg.image.load("animation/character_male_left_kick2.png"), (hero_width, hero_height)),
+                  pg.transform.scale(pg.image.load("animation/character_male_left_kick3.png"), (hero_width, hero_height)),
+                  pg.transform.scale(pg.image.load("animation/character_male_left_kick3.png"), (hero_width, hero_height)),
+                  pg.transform.scale(pg.image.load("animation/character_male_left_kick4.png"), (hero_width, hero_height)),
+                  pg.transform.scale(pg.image.load("animation/character_male_left_kick4.png"), (hero_width, hero_height))]
 
 block_images = {BlockType.grass: pg.image.load("textures/tile_grass.jpg"),
                 BlockType.dirt: pg.image.load("textures/tile_dirt.png"),
