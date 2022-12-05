@@ -5,6 +5,7 @@ from block import *
 from constants import *
 from world import *
 from hero import *
+from buttons import *
 
 
 class Game:
@@ -48,13 +49,19 @@ class Game:
         self.world_move_general(keys)
 
     def run(self):
+        start_button = Button(400, 300, start_img, 0.5)
         while not self.finished:
-            self.clock.tick(60)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.finished = True
-            self.event_handler()
-            self.drawer.update_screen(self.world.map, self.hero)
+            if not start_button.clicked:
+                self.screen.fill((0, 0, 0))
+                start_button.draw(self.screen)
+                pygame.display.update()
+            else:
+                self.clock.tick(60)
+                self.event_handler()
+                self.drawer.update_screen(self.world.map, self.hero)
 
 
 if __name__ == "__main__":
