@@ -14,8 +14,8 @@ sky_level = world_size_y - world_size_y // 3  # s Уровень неба
 
 hero_spawn_x = width // 2  # Место спавна героя
 hero_spawn_y = height // 2
-hero_width = 2 * block_size  # Геометрические размеры героя
-hero_height = 2.5 * block_size
+hero_width = 1.75 * block_size  # Геометрические размеры героя
+hero_height = 2.15 * block_size
 hero_speed = 1.75  # Кинематические свойства героя
 hero_jump_power = 20
 
