@@ -1,8 +1,10 @@
 import pygame
+
+import visual
 from constants import *
 
 
-class Button:
+class Button(visual.DrawableObject):
     """Класс для кнопок"""
     def __init__(self, x, y, image, scale):
         button_width = image.get_width()
@@ -12,7 +14,7 @@ class Button:
         self.rect.topleft = (x, y)
         self.clicked = False
 
-    def draw(self, surface):
+    def draw_on(self, surface):
         """Рисует кнопку"""
         action = False
         pos = pygame.mouse.get_pos()
