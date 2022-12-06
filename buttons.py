@@ -33,21 +33,20 @@ class Button(visual.DrawableObject):
                 action = True
         if not self.rect.collidepoint(pos):
             self.collided = False
-        if not pygame.mouse.get_pressed()[0]:
-            self.clicked = False
         return action
 
 
 def button_main():
     """Функция для тестирования"""
-    start_button = Button(350, 150, start_img_off, start_img_on, 1)
-    load_save_button = Button(350, 350, load_save_off, load_save_on, 1)
-    exit_button = Button(350, 550, exit_img_off, exit_img_on, 1)
+    LABaria = pygame.transform.scale(LABaria_pict, (1200, 800))
+    start_button = Button(350, 200, start_img_off, start_img_on, 1)
+    load_save_button = Button(350, 400, load_save_off, load_save_on, 1)
+    exit_button = Button(350, 600, exit_img_off, exit_img_on, 1)
     screen = pygame.display.set_mode((1200, 800))
     pygame.display.set_caption('Buttons')
     run = True
     while run:
-        screen.fill((100, 255, 200))
+        screen.blit(LABaria, (0, 0))
         start_button.draw_on(screen)
         exit_button.draw_on(screen)
         load_save_button.draw_on(screen)
@@ -60,6 +59,9 @@ def button_main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            if not pygame.mouse.get_pressed()[0]:
+                start_button.clicked = False
+                load_save_button.clicked = False
         pygame.display.update()
 
 
