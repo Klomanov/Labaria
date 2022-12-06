@@ -49,16 +49,12 @@ class Game:
         self.world_move_general(keys)
 
     def run(self):
-        start_button = Button(400, 300, start_img, 0.5)
+#        start_button = Button(350, 175, start_img_off, start_img_on, 1)
+#        exit_button = Button(350, 375, exit_img_off, exit_img_on, 1)
         while not self.finished:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.finished = True
-            if not start_button.clicked:
-                self.screen.fill((0, 0, 0))
-                start_button.draw(self.screen)
-                pygame.display.update()
-            else:
                 self.clock.tick(60)
                 self.event_handler()
                 self.drawer.update_screen(self.world.map, self.hero)
