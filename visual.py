@@ -5,7 +5,7 @@ class Drawer:
     def __init__(self, screen):
         self.screen = screen
 
-    def update_screen(self, world, hero):
+    def update_screen(self, world, hero, inventory):
         """
         Рисует все объекты на экране и обновляет его
         :param world:
@@ -17,6 +17,7 @@ class Drawer:
             for block in row:
                 block.draw_on(self.screen)
         hero.draw_on(self.screen)
+        inventory.draw_on(self.screen)
         pg.display.update()
 
 
