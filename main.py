@@ -6,6 +6,7 @@ from constants import *
 from world import *
 from hero import *
 from buttons import *
+from inventory import *
 
 
 class Game:
@@ -18,6 +19,7 @@ class Game:
         spawn_block = self.world.get_block(hero_spawn_x, hero_spawn_y)
         self.hero = Hero(spawn_block.x, spawn_block.y)
         self.clock = pg.time.Clock()
+        self.inventory = Inventory(self.screen)
 
     def world_move_general(self, keys):
 
@@ -61,7 +63,7 @@ class Game:
             else:
                 self.clock.tick(60)
                 self.event_handler()
-                self.drawer.update_screen(self.world.map, self.hero)
+                self.drawer.update_screen(self.world.map, self.hero, self.inventory)
 
 
 if __name__ == "__main__":
