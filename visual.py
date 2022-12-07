@@ -8,6 +8,7 @@ class Drawer:
     def update_screen(self, world, hero, inventory):
         """
         Рисует все объекты на экране и обновляет его
+        :param inventory:
         :param world:
         :param hero:
         :return:

@@ -60,7 +60,7 @@ class Game:
                     destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
                     self.world.brake_block(destroy_x, destroy_y)
             self.world_move_general(pg.key.get_pressed())
-            self.drawer.update_screen(self.world.map, self.hero)
+            self.drawer.update_screen(self.world.map, self.hero, self.inventory)
 
 
 if __name__ == "__main__":
