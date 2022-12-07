@@ -8,9 +8,9 @@ font_size = 24
 g = 1  # ускорение свободного падения
 
 # Ширина карты мира
-external_world_size = 30
+external_world_size = 100
 world_size_x = width // block_size + external_world_size  # Ширина карты мира
-world_size_y = height // block_size + 5  # Высота карты мира
+world_size_y = height // block_size + 50  # Высота карты мира
 sky_level = world_size_y - world_size_y // 3  # s Уровень неба
 
 hero_spawn_x = width // 2  # Место спавна героя
@@ -27,6 +27,9 @@ class BlockType:
     grass = 0
     dirt = 1
     sky = 2
+    bg_dirt = 3
+    stone = 4
+    bg_stone = 5
 
 
 class Animations:
@@ -76,11 +79,17 @@ class Animations:
 
 block_images = {BlockType.grass: pg.image.load("textures/tile_grass.jpg"),
                 BlockType.dirt: pg.image.load("textures/tile_dirt.png"),
-                BlockType.sky: pg.image.load("textures/tile_sky.png"),}
+                BlockType.sky: pg.image.load("textures/tile_sky.png"),
+                BlockType.bg_dirt: pg.image.load("textures/tile_bg_dirt.png"),
+                BlockType.stone: pg.image.load("textures/tile_stone.png"),
+                BlockType.bg_stone: pg.image.load("textures/tile_bg_stone.png")}
 
 block_collisions = {BlockType.grass: True,
                     BlockType.dirt: True,
-                    BlockType.sky: False}
-
+                    BlockType.sky: False,
+                    BlockType.bg_dirt: False,
+                    BlockType.stone: True,
+                    BlockType.bg_stone: False,
+                    }
 
 start_img = pg.image.load("menu/buttonStart.png")
