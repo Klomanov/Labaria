@@ -3,6 +3,7 @@ import pygame as pg
 block_size = 30
 height = 800
 width = 1200
+font_size = 24
 
 g = 1  # ускорение свободного падения
 
@@ -71,7 +72,6 @@ class Animations:
                   pg.transform.scale(pg.image.load("animation/character_male_down_kick4.png"), (hero_width, hero_height)),
                   pg.transform.scale(pg.image.load("animation/character_male_down_kick5.png"), (hero_width, hero_height)),
                   pg.transform.scale(pg.image.load("animation/character_male_down_kick6.png"), (hero_width, hero_height))]
-
 
 
 block_images = {BlockType.grass: pg.image.load("textures/tile_grass.jpg"),
