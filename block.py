@@ -12,6 +12,7 @@ class Block(visual.DrawableObject):
         self.collidable = block_collisions.get(type)
         self.image = pg.transform.scale(block_images[self.type], (block_size, block_size))
         self.rect = self.image.get_rect(center=(self.x, self.y))
+        self.breakable = block_breakable[self.type]
 
     def draw_on(self, surface):
         self.rect = self.image.get_rect(center=(self.x, self.y))
