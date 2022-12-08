@@ -58,7 +58,8 @@ class Game:
                     self.finished = True
                 if event.type == pg.MOUSEBUTTONDOWN:
                     destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
-                    self.world.brake_block(destroy_x, destroy_y)
+                    self.world.break_block(destroy_x, destroy_y)
+                    self.inventory.increase("dirt")
             self.world_move_general(pg.key.get_pressed())
             self.drawer.update_screen(self.world.map, self.hero, self.inventory)
 

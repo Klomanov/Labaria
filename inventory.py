@@ -22,10 +22,7 @@ class Inventory(visual.DrawableObject):
         self.whole_inventory = [None] * 4
 
     def increase(self, name):
-        try:
-            self.resources[name].amount += 1
-        except KeyError:
-            print("Error increasing")
+        self.resources[name].amount += 1
         self.update_whole()
 
     def update_whole(self):

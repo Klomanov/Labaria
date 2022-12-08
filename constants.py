@@ -17,7 +17,7 @@ hero_spawn_x = width // 2  # Место спавна героя
 hero_spawn_y = height // 2
 hero_width = 1.75 * block_size  # Геометрические размеры героя
 hero_height = 2.15 * block_size
-hero_speed = 1.75  # Кинематические свойства героя
+hero_speed = 2  # Кинематические свойства героя (в целых числах все нужно указывать)
 hero_jump_power = 20
 
 perlin_octaves = 1.5  # Зернистость генерации мира

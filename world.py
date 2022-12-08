@@ -108,8 +108,8 @@ class World:
         """Двигает все блоки в соответствии со скоростью"""
         for row in self.map:
             for block in row:
-                block.y += self.vy
-                block.x += self.vx
+                block.y += round(self.vy)
+                block.x += round(self.vx)
 
     def will_collide_with_rect(self, vx, vy, rect):
         """
@@ -125,5 +125,5 @@ class World:
                     return True
         return False
 
-    def brake_block(self, x, y):
+    def break_block(self, x, y):
         self.map[y][x] = Block(self.map[y][x].x, self.map[y][x].y, BlockType.sky)
