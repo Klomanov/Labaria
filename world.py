@@ -127,4 +127,5 @@ class World:
         return False
 
     def break_block(self, x, y):
-        self.map[y][x] = Block(self.map[y][x].x, self.map[y][x].y, BlockType.sky)
+        if self.map[y][x].breakable:
+            self.map[y][x] = Block(self.map[y][x].x, self.map[y][x].y, block_bg[self.map[y][x].type])
