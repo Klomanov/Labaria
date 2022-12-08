@@ -12,9 +12,29 @@ class World:
         self.map = []
         self.vx = 0
         self.vy = 0
-        self.init_world()
+        self.init_landscape()
+        self.init_stone()
+        self.init_caves()
 
-    def init_world(self):
+    def init_caves(self):
+        if self.seed == -1:
+            noise1 = PerlinNoise(perlin_octaves)
+            noise2 = PerlinNoise(perlin_octaves * 2)
+        else:
+            noise1 = PerlinNoise(perlin_octaves, self.seed)
+            noise2 = PerlinNoise(perlin_octaves * 2, self.seed)
+
+        for x in range(world_size_x):
+            grass_y = None
+            for y in range(world_size_y):
+                if grass_y is not None and y > grass_y:
+                    value = noise1([x / world_size_x, y / world_size_y]) + 0.4 * noise2(
+                        [x / world_size_x, y / world_size_y])
+                    self.map[y][x] = Block(self.map[y][x].x, self.map[y][x].y, BlockType.bg_stone if round(value*12) == 1
+                    else BlockType.stone)
+                if self.map[y][x].type == BlockType.grass: grass_y = y + 2
+
+    def init_landscape(self):
         """
         Инициализирует мир с помощью шума Перлина.
         :return: массив мира
@@ -52,17 +72,37 @@ class World:
             for ny in range(y + 1, world_size_y):
                 self.map[ny][x] = Block(self.map[ny][x].x, self.map[ny][x].y, BlockType.dirt)
 
-    def get_block(self, x, y):
+    def init_stone(self):
+        if self.seed == -1:
+            noise1 = PerlinNoise(perlin_octaves)
+            noise2 = PerlinNoise(perlin_octaves * 2)
+        else:
+            noise1 = PerlinNoise(perlin_octaves, self.seed)
+            noise2 = PerlinNoise(perlin_octaves * 2, self.seed)
+
+        for x in range(world_size_x):
+            grass_y = None
+            for y in range(world_size_y):
+                if self.map[y][x].type == BlockType.grass: grass_y = y
+            value = noise1([x / world_size_x, 1]) + 0.1 * noise2(
+                [x / world_size_x, 1])
+            stone_y = round(grass_y + 2 + abs(value * 15))
+            self.map[stone_y][x] = Block(self.map[stone_y][x].x, self.map[stone_y][x].y, BlockType.stone)
+            for ny in range(stone_y + 1, world_size_y):
+                self.map[ny][x] = Block(self.map[ny][x].x, self.map[ny][x].y, BlockType.stone)
+
+    def get_block(self, point_x, point_y):
         """
         Получает объект блока по заданной координате
-        :param x:
-        :param y:
+        :param point_y:
+        :param point_x:
+
         :return: Block object
         """
-        for row in self.map:
-            for block in row:
-                if block.rect.collidepoint((x, y)):
-                    return block
+        for y in range(len(self.map)):
+            for x in range(len(self.map[y])):
+                if self.map[y][x].rect.collidepoint((point_x, point_y)):
+                    return x, y
 
     def move(self):
         """Двигает все блоки в соответствии со скоростью"""
@@ -81,7 +121,9 @@ class World:
         """
         for row in self.map:
             for block in row:
-                if block.rect.move(vx, vy).colliderect(rect) and block.collidable:
+                if block.rect.move(vx + (0.5*vx/abs(vx) if vx != 0 else 0), vy).colliderect(rect) and block.collidable:
                     return True
         return False
 
+    def brake_block(self, x, y):
+        self.map[y][x] = Block(self.map[y][x].x, self.map[y][x].y, BlockType.sky)
