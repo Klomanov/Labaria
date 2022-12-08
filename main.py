@@ -21,9 +21,12 @@ class Game:
         self.hero = Hero(spawn_block.x, spawn_block.y)
         self.clock = pg.time.Clock()
         self.inventory = Inventory(self.screen)
+        self.game_status = "Main menu"
         self.background = pygame.transform.scale(LABaria_pict, (1200, 800))
         self.start_button = Button(350, 200, start_img_off, start_img_on, 1)
-        self.load_save_button = Button(350, 400, load_save_off, load_save_on, 1)
+        self.load_save_button = Button(350, 400, load_save_img_off, load_save_img_on, 1)
+        self.back_button = Button(350, 200, back_img_off, back_img_on, 1)
+        self.save_game_button = Button(350, 400, save_game_img_off, save_game_img_on, 1)
         self.exit_button = Button(350, 600, exit_img_off, exit_img_on, 1)
 
     def world_move_general(self, keys):
@@ -57,22 +60,36 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.finished = True
-        self.screen.blit(self.background, (0, 0))
-        self.start_button.draw_on(self.screen)
-        self.exit_button.draw_on(self.screen)
-        self.load_save_button.draw_on(self.screen)
-        self.start_button.collide(self.screen)
-        if self.exit_button.collide(self.screen):
-            self.finished = True
-        if self.load_save_button.collide(self.screen):
-            print("In progress...")
+        if self.game_status == "Main menu":
+            self.screen.blit(self.background, (0, 0))
+            self.start_button.draw_on(self.screen)
+            self.exit_button.draw_on(self.screen)
+            self.load_save_button.draw_on(self.screen)
+            if self.start_button.collide(self.screen):
+                self.game_status = "In game"
+            if self.exit_button.collide(self.screen):
+                self.finished = True
+            if self.load_save_button.collide(self.screen):
+                print("In progress...")
+        if self.game_status == "Pause":
+            self.back_button.clicked = False
+            self.screen.blit(self.background, (0, 0))
+            self.back_button.draw_on(self.screen)
+            if self.back_button.collide(self.screen):
+                self.game_status = "In game"
+            self.exit_button.draw_on(self.screen)
+            if self.exit_button.collide(self.screen):
+                self.finished = True
+            self.save_game_button.draw_on(self.screen)
+            if self.save_game_button.collide(self.screen):
+                print("In progress...")
         pygame.display.update()
 
     def run(self):
         while not self.finished:
-            if not self.start_button.clicked:
+            if self.game_status != "In game":
                 self.click_handler()
-            else:
+            elif self.game_status == "In game":
                 self.clock.tick(60)
                 for event in pg.event.get():
                     if event.type == pg.QUIT:
@@ -80,6 +97,9 @@ class Game:
                     if event.type == pg.MOUSEBUTTONDOWN:
                         destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
                         self.world.brake_block(destroy_x, destroy_y)
+                    if event.type == pg.KEYDOWN:
+                        if event.key == pg.K_ESCAPE:
+                            self.game_status = "Pause"
                 self.world_move_general(pg.key.get_pressed())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
 
