@@ -121,7 +121,8 @@ class World:
         """
         for row in self.map:
             for block in row:
-                if block.rect.move(vx + (0.5*vx/abs(vx) if vx != 0 else 0), vy).colliderect(rect) and block.collidable:
+                if block.rect.move(vx + (0.5*vx/abs(vx) if vx != 0 else 0),
+                                   vy + (0.5*vy/abs(vy) if vy != 0 else 0)).colliderect(rect) and block.collidable:
                     return True
         return False
 
