@@ -83,6 +83,10 @@ class Game:
             self.save_game_button.draw_on(self.screen)
             if self.save_game_button.collide(self.screen):
                 print("In progress...")
+            for event in pg.event.get():
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE:
+                        self.game_status = "In game"
         pygame.display.update()
 
     def run(self):
