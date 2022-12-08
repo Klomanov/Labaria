@@ -92,4 +92,12 @@ block_collisions = {BlockType.grass: True,
                     BlockType.bg_stone: False,
                     }
 
-start_img = pg.image.load("menu/buttonStart.png")
+start_img_off = pg.image.load("menu/button_start_off.png")
+start_img_on = pg.image.load("menu/button_start_on.png")
+exit_img_on = pg.image.load("menu/button_exit_on.png")
+exit_img_off = pg.image.load("menu/button_exit_off.png")
+load_save_on = pg.image.load("menu/button_load_save_on.png")
+load_save_off = pg.image.load("menu/button_load_save_off.png")
+LABaria_pict = pg.image.load("menu/LABaria.png")
+
+
