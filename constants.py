@@ -16,8 +16,8 @@ sky_level = world_size_y - world_size_y // 3  # s Уровень неба
 hero_spawn_x = width // 2  # Место спавна героя
 hero_spawn_y = height // 2
 hero_width = 1.75 * block_size  # Геометрические размеры героя
-hero_height = 2.15 * block_size
-hero_speed = 1.75  # Кинематические свойства героя
+hero_height = 2 * block_size
+hero_speed = 3  # Кинематические свойства героя (в целых числах все нужно указывать)
 hero_jump_power = 20
 
 perlin_octaves = 1.5  # Зернистость генерации мира
@@ -91,6 +91,22 @@ block_collisions = {BlockType.grass: True,
                     BlockType.stone: True,
                     BlockType.bg_stone: False,
                     }
+
+block_breakable = {BlockType.grass: True,
+                   BlockType.dirt: True,
+                   BlockType.sky: False,
+                   BlockType.bg_dirt: False,
+                   BlockType.stone: True,
+                   BlockType.bg_stone: False,
+                   }
+
+
+block_bg = {BlockType.grass: BlockType.bg_dirt,
+            BlockType.dirt:  BlockType.bg_dirt,
+            BlockType.sky: BlockType.sky,
+            BlockType.bg_dirt:  BlockType.bg_dirt,
+            BlockType.stone: BlockType.bg_stone,
+            BlockType.bg_stone: BlockType.bg_stone}
 
 start_img_off = pg.image.load("menu/button_start_off.png")
 start_img_on = pg.image.load("menu/button_start_on.png")

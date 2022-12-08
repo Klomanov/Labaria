@@ -31,7 +31,7 @@ class World:
                     value = noise1([x / world_size_x, y / world_size_y]) + 0.4 * noise2(
                         [x / world_size_x, y / world_size_y])
                     self.map[y][x] = Block(self.map[y][x].x, self.map[y][x].y, BlockType.bg_stone if round(value*12) == 1
-                    else BlockType.stone)
+                    else self.map[y][x].type)
                 if self.map[y][x].type == BlockType.grass: grass_y = y + 2
 
     def init_landscape(self):
@@ -84,9 +84,9 @@ class World:
             grass_y = None
             for y in range(world_size_y):
                 if self.map[y][x].type == BlockType.grass: grass_y = y
-            value = noise1([x / world_size_x, 1]) + 0.1 * noise2(
+            value = noise1([x / world_size_x, 1]) + 0.9 * noise2(
                 [x / world_size_x, 1])
-            stone_y = round(grass_y + 2 + abs(value * 15))
+            stone_y = round(grass_y + 2 + abs(value * 11))
             self.map[stone_y][x] = Block(self.map[stone_y][x].x, self.map[stone_y][x].y, BlockType.stone)
             for ny in range(stone_y + 1, world_size_y):
                 self.map[ny][x] = Block(self.map[ny][x].x, self.map[ny][x].y, BlockType.stone)
@@ -108,8 +108,8 @@ class World:
         """Двигает все блоки в соответствии со скоростью"""
         for row in self.map:
             for block in row:
-                block.y += self.vy
-                block.x += self.vx
+                block.y += round(self.vy)
+                block.x += round(self.vx)
 
     def will_collide_with_rect(self, vx, vy, rect):
         """
@@ -121,9 +121,11 @@ class World:
         """
         for row in self.map:
             for block in row:
-                if block.rect.move(vx + (0.5*vx/abs(vx) if vx != 0 else 0), vy).colliderect(rect) and block.collidable:
+                if block.rect.move(vx + (0.5*vx/abs(vx) if vx != 0 else 0),
+                                   vy + (0.5*vy/abs(vy) if vy != 0 else 0)).colliderect(rect) and block.collidable:
                     return True
         return False
 
-    def brake_block(self, x, y):
-        self.map[y][x] = Block(self.map[y][x].x, self.map[y][x].y, BlockType.sky)
+    def break_block(self, x, y):
+        if self.map[y][x].breakable:
+            self.map[y][x] = Block(self.map[y][x].x, self.map[y][x].y, block_bg[self.map[y][x].type])
