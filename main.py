@@ -7,6 +7,7 @@ from world import *
 from hero import *
 from buttons import *
 from inventory import *
+import time
 
 
 class Game:
@@ -25,6 +26,7 @@ class Game:
         self.start_button = Button(350, 200, start_img_off, start_img_on, 1)
         self.load_save_button = Button(350, 400, load_save_off, load_save_on, 1)
         self.exit_button = Button(350, 600, exit_img_off, exit_img_on, 1)
+        self.game_status = GameStatus.in_main_menu
 
     def world_move_general(self, keys):
 
@@ -50,10 +52,33 @@ class Game:
             self.world.vy = 0
         else:
             self.hero.falling = True
-        self.hero.set_animation(self.world.vx)
         self.world.move()
 
-    def click_handler(self):
+    def break_block(self, block_x, block_y):
+        block = self.world.map[block_y][block_x]
+        s = time.time()
+        if block.breaking_time is not None:
+            if self.hero.breaking_block == block:
+                if s - self.hero.breaking_start_time >= block_breaking_time[block.type]:
+                    self.world.remove_block(block_x, block_y)
+                    self.stop_break_block()
+                else:
+                    degree = (s - self.hero.breaking_start_time) / block_breaking_time[block.type]
+                    block.set_dark_level(degree * 0.4)
+            else:
+                self.stop_break_block()
+                self.hero.breaking_block = block
+                self.hero.breaking_start_time = s
+        else:
+            self.stop_break_block()
+
+    def stop_break_block(self):
+        if self.hero.breaking_block is not None:  # Останвливает ломание блока
+            self.hero.breaking_block.set_dark_level(0)
+            self.hero.breaking_block = None
+            self.hero.breaking_start_time = None
+
+    def main_menu_activity(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.finished = True
@@ -68,20 +93,33 @@ class Game:
             print("In progress...")
         pygame.display.update()
 
+    def event_handler(self, events):
+        for event in events:
+            if event.type == pg.QUIT:
+                self.finished = True
+            if event.type == pg.MOUSEBUTTONUP and event.button == pg.BUTTON_LEFT:
+                self.stop_break_block()
+
+        if pg.mouse.get_pressed()[0]:
+            destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
+            d_block = self.world.map[destroy_y][destroy_x]
+            if (d_block.x - self.hero.x) ** 2 + (d_block.y - self.hero.y) ** 2 <= hero_dig_range ** 2:
+                self.break_block(destroy_x, destroy_y)
+            else:
+                self.stop_break_block()
+        self.world_move_general(pg.key.get_pressed())
+        self.hero.set_animation(self.world.vx)
+
     def run(self):
         while not self.finished:
-            if not self.start_button.clicked:
-                self.click_handler()
-            else:
+            if self.start_button.clicked:
+                self.game_status = GameStatus.in_game
+            if self.game_status == GameStatus.in_game:
                 self.clock.tick(60)
-                for event in pg.event.get():
-                    if event.type == pg.QUIT:
-                        self.finished = True
-                    if event.type == pg.MOUSEBUTTONDOWN:
-                        destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
-                        self.world.break_block(destroy_x, destroy_y)
-                self.world_move_general(pg.key.get_pressed())
+                self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
+            if self.game_status == GameStatus.in_main_menu:
+                self.main_menu_activity()
 
 
 if __name__ == "__main__":
