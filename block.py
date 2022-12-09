@@ -12,9 +12,17 @@ class Block(visual.DrawableObject):
         self.collidable = block_collisions.get(type)
         self.image = pg.transform.scale(block_images[self.type], (block_size, block_size))
         self.rect = self.image.get_rect(center=(self.x, self.y))
-        self.breakable = block_breakable[self.type]
+        self.breaking_time = block_breaking_time[self.type]
 
     def draw_on(self, surface):
         self.rect = self.image.get_rect(center=(self.x, self.y))
         surface.blit(self.image, self.rect)
+
+    def set_dark_level(self, degree):
+        """
+
+        :param degree: уровень затемнения (от 0 до 1)
+        :return:
+        """
+        self.image.set_alpha(255 - degree*255)
 

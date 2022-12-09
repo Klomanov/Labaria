@@ -9,13 +9,14 @@ class Hero(visual.DrawableObject):
         self.x = x
         self.y = y
         self.falling = False
-        self.breaking = False
         self.animation = Animations.static[0]
         self.image = pg.transform.scale(self.animation, (hero_width, hero_height))
         self.rect = self.image.get_rect(center=(self.x, self.y))
+        self.breaking_block = None
+        self.breaking_start_time = None
 
     def set_animation(self, vx):
-        if self.breaking:
+        if self.breaking_block is not None:
             self.animation = Animations.break_down
         else:
             if self.falling and vx > 0:

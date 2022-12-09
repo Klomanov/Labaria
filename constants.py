@@ -19,6 +19,7 @@ hero_width = 1.75 * block_size  # Геометрические размеры г
 hero_height = 2 * block_size
 hero_speed = 3  # Кинематические свойства героя (в целых числах все нужно указывать)
 hero_jump_power = 20
+hero_dig_range = 2.3*block_size
 
 perlin_octaves = 1.5  # Зернистость генерации мира
 
@@ -39,6 +40,29 @@ block_images = {BlockType.grass: pg.image.load("textures/tile_grass.jpg"),
                 BlockType.stone: pg.image.load("textures/tile_stone.png"),
                 BlockType.bg_stone: pg.image.load("textures/tile_bg_stone.png")}
 
+block_breaking_time = {BlockType.grass: 0.5,  # Время в секундах на ломание блока
+                       BlockType.dirt: 0.5,
+                       BlockType.stone: 1,
+                       BlockType.bg_dirt: None,
+                       BlockType.sky: None,
+                       BlockType.bg_stone: None,
+                       }
+
+block_collisions = {BlockType.grass: True,
+                    BlockType.dirt: True,
+                    BlockType.sky: False,
+                    BlockType.bg_dirt: False,
+                    BlockType.stone: True,
+                    BlockType.bg_stone: False,
+                    }
+
+block_bg = {BlockType.grass: BlockType.bg_dirt,
+            BlockType.dirt: BlockType.bg_dirt,
+            BlockType.sky: BlockType.sky,
+            BlockType.bg_dirt: BlockType.bg_dirt,
+            BlockType.stone: BlockType.bg_stone,
+            BlockType.bg_stone: BlockType.bg_stone}
+
 
 class ResourceType:
     grass = 1
@@ -48,7 +72,7 @@ class ResourceType:
 
 resource_images = {ResourceType.grass: pg.image.load("textures/tile_grass.jpg"),
                    ResourceType.dirt: pg.image.load("textures/tile_dirt.png"),
-                   ResourceType.stone: pg.image.load("textures/tile_stone.png"),}
+                   ResourceType.stone: pg.image.load("textures/tile_stone.png"), }
 
 
 class GameStatus:
@@ -105,29 +129,6 @@ class Animations:
         pg.transform.scale(pg.image.load("animation/character_male_down_kick5.png"), (hero_width, hero_height)),
         pg.transform.scale(pg.image.load("animation/character_male_down_kick6.png"), (hero_width, hero_height))]
 
-
-block_collisions = {BlockType.grass: True,
-                    BlockType.dirt: True,
-                    BlockType.sky: False,
-                    BlockType.bg_dirt: False,
-                    BlockType.stone: True,
-                    BlockType.bg_stone: False,
-                    }
-
-block_breakable = {BlockType.grass: True,
-                   BlockType.dirt: True,
-                   BlockType.sky: False,
-                   BlockType.bg_dirt: False,
-                   BlockType.stone: True,
-                   BlockType.bg_stone: False,
-                   }
-
-block_bg = {BlockType.grass: BlockType.bg_dirt,
-            BlockType.dirt: BlockType.bg_dirt,
-            BlockType.sky: BlockType.sky,
-            BlockType.bg_dirt: BlockType.bg_dirt,
-            BlockType.stone: BlockType.bg_stone,
-            BlockType.bg_stone: BlockType.bg_stone}
 
 start_img_off = pg.image.load("menu/button_start_off.png")
 start_img_on = pg.image.load("menu/button_start_on.png")
