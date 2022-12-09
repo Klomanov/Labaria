@@ -14,7 +14,7 @@ class Game:
     def __init__(self):
         pg.init()
         self.finished = False
-        self.screen = pg.display.set_mode((width, height))
+        self.screen = pg.display.set_mode((screen_width, screen_height))
         self.drawer = visual.Drawer(self.screen)
         self.world = World(-1)
         spawn_block_x, spawn_block_y = self.world.get_block(hero_spawn_x, hero_spawn_y)
@@ -64,7 +64,7 @@ class Game:
                     self.stop_break_block()
                 else:
                     degree = (s - self.hero.breaking_start_time) / block_breaking_time[block.type]
-                    block.set_dark_level(degree * 0.4)
+                    block.set_transparency_level(degree * 0.4)
             else:
                 self.stop_break_block()
                 self.hero.breaking_block = block
@@ -74,7 +74,7 @@ class Game:
 
     def stop_break_block(self):
         if self.hero.breaking_block is not None:  # Останвливает ломание блока
-            self.hero.breaking_block.set_dark_level(0)
+            self.hero.breaking_block.set_transparency_level(0)
             self.hero.breaking_block = None
             self.hero.breaking_start_time = None
 
@@ -115,7 +115,7 @@ class Game:
             if self.start_button.clicked:
                 self.game_status = GameStatus.in_game
             if self.game_status == GameStatus.in_game:
-                self.clock.tick(60)
+                self.clock.tick(90)
                 self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
             if self.game_status == GameStatus.in_main_menu:
