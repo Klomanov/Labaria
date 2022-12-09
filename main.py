@@ -57,6 +57,7 @@ class Game:
         self.world.move()
 
     def click_handler(self):
+        """Обрабатывает кнопки"""
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.finished = True
@@ -82,12 +83,46 @@ class Game:
                 self.finished = True
             self.save_game_button.draw_on(self.screen)
             if self.save_game_button.collide(self.screen):
-                print("In progress...")
+                print("Введите название сохранения:")
+                name = input()
+                self.save(name)
             for event in pg.event.get():
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_ESCAPE:
                         self.game_status = "In game"
         pygame.display.update()
+
+    def save(self, name):
+        """Сохраняет мир в файл"""
+        file = open(f'saves/{name}', 'a')
+        try:
+            for rows in self.world.map:
+                for block in rows:
+                    file.write(f'{block.x}_{block.y}_{block.type} ')
+                file.write('$')
+        finally:
+            file.close()
+
+    def download(self, name):
+        """Скачивает мир из файла"""
+        i = 0
+        j = 0
+        file = open(f'saves/{name}', 'r')
+        try:
+            text = file.read()
+            text = text.split('$')
+            for string in text:
+                string = string.split()
+                for ministring in string:
+                    ministring = ministring.split('_')
+                    self.world.map[i][j].x = float(ministring[0])
+                    self.world.map[i][j].y = float(ministring[1])
+                    self.world.map[i][j].type = int(float(ministring[2]))
+                    j += 1
+                j = 0
+                i += 1
+        finally:
+            file.close()
 
     def run(self):
         while not self.finished:
@@ -110,3 +145,4 @@ class Game:
 
 if __name__ == "__main__":
     Game().run()
+
