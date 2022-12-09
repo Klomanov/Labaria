@@ -32,6 +32,31 @@ class BlockType:
     bg_stone = 5
 
 
+block_images = {BlockType.grass: pg.image.load("textures/tile_grass.jpg"),
+                BlockType.dirt: pg.image.load("textures/tile_dirt.png"),
+                BlockType.sky: pg.image.load("textures/tile_sky.png"),
+                BlockType.bg_dirt: pg.image.load("textures/tile_bg_dirt.png"),
+                BlockType.stone: pg.image.load("textures/tile_stone.png"),
+                BlockType.bg_stone: pg.image.load("textures/tile_bg_stone.png")}
+
+
+class ResourceType:
+    grass = 1
+    dirt = 1
+    stone = 2
+
+
+resource_images = {ResourceType.grass: pg.image.load("textures/tile_grass.jpg"),
+                   ResourceType.dirt: pg.image.load("textures/tile_dirt.png"),
+                   ResourceType.stone: pg.image.load("textures/tile_stone.png"),}
+
+
+class GameStatus:
+    in_main_menu = 0
+    in_game = 1
+    in_pause = 2
+
+
 class Animations:
     left = [pg.transform.scale(pg.image.load("animation/character_male_left_walk0.png"), (hero_width, hero_height)),
             pg.transform.scale(pg.image.load("animation/character_male_left_walk1.png"), (hero_width, hero_height)),
@@ -49,40 +74,37 @@ class Animations:
              pg.transform.scale(pg.image.load("animation/character_male_right_walk5.png"), (hero_width, hero_height)),
              pg.transform.scale(pg.image.load("animation/character_male_right_walk6.png"), (hero_width, hero_height)),
              pg.transform.scale(pg.image.load("animation/character_male_right_walk7.png"), (hero_width, hero_height))]
-    jump_right = [pg.transform.scale(pg.image.load("animation/character_male_right_jump.png"), (hero_width, hero_height))]
+    jump_right = [
+        pg.transform.scale(pg.image.load("animation/character_male_right_jump.png"), (hero_width, hero_height))]
     jump_left = [pg.transform.scale(pg.image.load("animation/character_male_left_jump.png"), (hero_width, hero_height))]
     static = [pg.transform.scale(pg.image.load("animation/character_male_idle.png"), (hero_width, hero_height))]
-    break_right = [pg.transform.scale(pg.image.load("animation/character_male_right_kick1.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_right_kick1.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_right_kick2.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_right_kick2.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_right_kick3.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_right_kick3.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_right_kick4.png"), (hero_width, hero_height)),
-                   pg.transform.scale(pg.image.load("animation/character_male_right_kick4.png"), (hero_width, hero_height))]
-    break_left = [pg.transform.scale(pg.image.load("animation/character_male_left_kick1.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_left_kick1.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_left_kick2.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_left_kick2.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_left_kick3.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_left_kick3.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_left_kick4.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_left_kick4.png"), (hero_width, hero_height))]
-    break_down = [pg.transform.scale(pg.image.load("animation/character_male_left_kick1.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_down_kick2.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_down_kick3.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_down_kick3.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_down_kick4.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_down_kick5.png"), (hero_width, hero_height)),
-                  pg.transform.scale(pg.image.load("animation/character_male_down_kick6.png"), (hero_width, hero_height))]
+    break_right = [
+        pg.transform.scale(pg.image.load("animation/character_male_right_kick1.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_right_kick1.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_right_kick2.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_right_kick2.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_right_kick3.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_right_kick3.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_right_kick4.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_right_kick4.png"), (hero_width, hero_height))]
+    break_left = [
+        pg.transform.scale(pg.image.load("animation/character_male_left_kick1.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_left_kick1.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_left_kick2.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_left_kick2.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_left_kick3.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_left_kick3.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_left_kick4.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_left_kick4.png"), (hero_width, hero_height))]
+    break_down = [
+        pg.transform.scale(pg.image.load("animation/character_male_left_kick1.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_down_kick2.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_down_kick3.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_down_kick3.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_down_kick4.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_down_kick5.png"), (hero_width, hero_height)),
+        pg.transform.scale(pg.image.load("animation/character_male_down_kick6.png"), (hero_width, hero_height))]
 
-
-block_images = {BlockType.grass: pg.image.load("textures/tile_grass.jpg"),
-                BlockType.dirt: pg.image.load("textures/tile_dirt.png"),
-                BlockType.sky: pg.image.load("textures/tile_sky.png"),
-                BlockType.bg_dirt: pg.image.load("textures/tile_bg_dirt.png"),
-                BlockType.stone: pg.image.load("textures/tile_stone.png"),
-                BlockType.bg_stone: pg.image.load("textures/tile_bg_stone.png")}
 
 block_collisions = {BlockType.grass: True,
                     BlockType.dirt: True,
@@ -100,11 +122,10 @@ block_breakable = {BlockType.grass: True,
                    BlockType.bg_stone: False,
                    }
 
-
 block_bg = {BlockType.grass: BlockType.bg_dirt,
-            BlockType.dirt:  BlockType.bg_dirt,
+            BlockType.dirt: BlockType.bg_dirt,
             BlockType.sky: BlockType.sky,
-            BlockType.bg_dirt:  BlockType.bg_dirt,
+            BlockType.bg_dirt: BlockType.bg_dirt,
             BlockType.stone: BlockType.bg_stone,
             BlockType.bg_stone: BlockType.bg_stone}
 
@@ -115,5 +136,3 @@ exit_img_off = pg.image.load("menu/button_exit_off.png")
 load_save_on = pg.image.load("menu/button_load_save_on.png")
 load_save_off = pg.image.load("menu/button_load_save_off.png")
 LABaria_pict = pg.image.load("menu/LABaria.png")
-
-

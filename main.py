@@ -25,6 +25,7 @@ class Game:
         self.start_button = Button(350, 200, start_img_off, start_img_on, 1)
         self.load_save_button = Button(350, 400, load_save_off, load_save_on, 1)
         self.exit_button = Button(350, 600, exit_img_off, exit_img_on, 1)
+        self.game_status = GameStatus.in_main_menu
 
     def world_move_general(self, keys):
 
@@ -53,7 +54,7 @@ class Game:
         self.hero.set_animation(self.world.vx)
         self.world.move()
 
-    def click_handler(self):
+    def main_menu_activity(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.finished = True
@@ -68,20 +69,25 @@ class Game:
             print("In progress...")
         pygame.display.update()
 
+    def event_handler(self, events):
+        for event in events:
+            if event.type == pg.QUIT:
+                self.finished = True
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
+                self.world.break_block(destroy_x, destroy_y)
+        self.world_move_general(pg.key.get_pressed())
+
     def run(self):
         while not self.finished:
-            if not self.start_button.clicked:
-                self.click_handler()
-            else:
+            if self.start_button.clicked:
+                self.game_status = GameStatus.in_game
+            if self.game_status == GameStatus.in_game:
                 self.clock.tick(60)
-                for event in pg.event.get():
-                    if event.type == pg.QUIT:
-                        self.finished = True
-                    if event.type == pg.MOUSEBUTTONDOWN:
-                        destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
-                        self.world.break_block(destroy_x, destroy_y)
-                self.world_move_general(pg.key.get_pressed())
+                self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
+            if self.game_status == GameStatus.in_main_menu:
+                self.main_menu_activity()
 
 
 if __name__ == "__main__":

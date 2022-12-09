@@ -9,21 +9,25 @@ class Hero(visual.DrawableObject):
         self.x = x
         self.y = y
         self.falling = False
+        self.breaking = False
         self.animation = Animations.static[0]
         self.image = pg.transform.scale(self.animation, (hero_width, hero_height))
         self.rect = self.image.get_rect(center=(self.x, self.y))
 
     def set_animation(self, vx):
-        if self.falling and vx > 0:
-            self.animation = Animations.jump_left
-        elif self.falling and vx < 0:
-            self.animation = Animations.jump_right
-        elif vx > 0:
-            self.animation = Animations.left
-        elif vx < 0:
-            self.animation = Animations.right
+        if self.breaking:
+            self.animation = Animations.break_down
         else:
-            self.animation = Animations.static
+            if self.falling and vx > 0:
+                self.animation = Animations.jump_left
+            elif self.falling and vx < 0:
+                self.animation = Animations.jump_right
+            elif vx > 0:
+                self.animation = Animations.left
+            elif vx < 0:
+                self.animation = Animations.right
+            else:
+                self.animation = Animations.static
 
     def draw_on(self, screen):
         if self.animCount + 1 >= 35:
