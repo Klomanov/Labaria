@@ -139,6 +139,7 @@ class GameStatus:
     in_main_menu = 0
     in_game = 1
     in_pause = 2
+    in_saves = 3
 
 
 class Animations:
@@ -201,3 +202,5 @@ back_img_off = pg.image.load("menu/button_back_off.png")
 back_img_on = pg.image.load("menu/button_back_on.png")
 save_game_img_off = pg.image.load("menu/button_save_game_off.png")
 save_game_img_on = pg.image.load("menu/button_save_game_on.png")
+save_img_off = pg.image.load("menu/button_save_off.png")
+save_img_on = pg.image.load("menu/button_save_on.png")

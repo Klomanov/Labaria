@@ -30,6 +30,8 @@ class Game:
         self.game_status = GameStatus.in_main_menu
         self.back_button = Button(350, 200, back_img_off, back_img_on, 1)
         self.save_game_button = Button(350, 400, save_game_img_off, save_game_img_on, 1)
+        self.files = os.listdir('saves')
+        self.saves = []
 
     def world_move_general(self, keys):
 
@@ -94,16 +96,18 @@ class Game:
         if self.exit_button.collide(self.screen):
             self.finished = True
         if self.load_save_button.collide(self.screen):
-            print("Введите название сохранения:")
-            name = input()
-            files = os.listdir('saves')
-            if name in files:
-                self.download(name)
-                self.game_status = GameStatus.in_game
-            else:
-                print("Сохранение не найдено.")
-        else:
-            self.load_save_button.clicked = False
+            self.game_status = GameStatus.in_saves
+            self.saves[1].clicked = True
+#            print("Введите название сохранения:")
+#            name = input()
+#            files = os.listdir('saves')
+#            if name in files:
+#                self.download(name)
+#                self.game_status = GameStatus.in_game
+#            else:
+#                print("Сохранение не найдено.")
+#        else:
+#            self.load_save_button.clicked = False
         pygame.display.update()
 
     def pause_activity(self):
@@ -113,7 +117,6 @@ class Game:
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 self.game_status = GameStatus.in_game
         self.back_button.clicked = False
-        self.save_game_button.clicked = False
         self.screen.blit(self.background, (0, 0))
         self.back_button.draw_on(self.screen)
         if self.back_button.collide(self.screen):
@@ -125,15 +128,46 @@ class Game:
         if self.save_game_button.collide(self.screen):
             print("Введите название сохранения:")
             name = input()
-            files = os.listdir('saves')
-            if name in files:
+            if name in self.files:
                 print('Это название уже занято. Используйте другое название.')
             else:
-                self.save(name)
+                self.save_game(name)
                 print('Файл сохранён.')
+                self.files = os.listdir('saves')
+        else:
+            self.save_game_button.clicked = False
         pygame.display.update()
 
-    def save(self, name):
+    def check_saves(self):
+        """Добавляет массив кнопок в соответствии с файлами в 'saves'"""
+        i = 200
+        j = 0
+        for file in self.files:
+            self.saves.append(Button(350, i, save_img_off, save_img_on, 1))
+            i += 200
+            j += 1
+
+    def in_saves_activity(self):
+        f1 = pg.font.SysFont('TronicaMono-Regular otf (400) font', 80)
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.finished = True
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                self.game_status = GameStatus.in_main_menu
+            if event.type == pg.MOUSEMOTION:
+                self.saves[1].clicked = False
+        self.screen.blit(self.background, (0, 0))
+        i = 220
+        for k in range(len(self.saves)):
+            self.saves[k].draw_on(self.screen)
+            self.screen.blit(f1.render(self.files[k], False, (0, 0, 0)), (400, i))
+            i += 200
+            if self.saves[k].collide(self.screen):
+                self.download_game(self.files[k])
+                self.game_status = GameStatus.in_game
+        pygame.display.update()
+
+    def save_game(self, name):
         """Сохраняет мир в файл"""
         file = open(f'saves/{name}', 'a')
         try:
@@ -144,7 +178,7 @@ class Game:
         finally:
             file.close()
 
-    def download(self, name):
+    def download_game(self, name):
         """Скачивает мир из файла"""
         i = 0
         j = 0
@@ -184,9 +218,13 @@ class Game:
         self.hero.set_animation(self.world.vx)
 
     def run(self):
+        pg.font.init()
+        self.check_saves()
         while not self.finished:
             if self.game_status == GameStatus.in_main_menu:
                 self.main_menu_activity()
+            if self.game_status == GameStatus.in_saves:
+                self.in_saves_activity()
             if self.game_status == GameStatus.in_game:
                 self.clock.tick(90)
                 self.event_handler(pygame.event.get())
