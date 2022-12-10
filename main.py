@@ -7,13 +7,14 @@ from world import *
 from hero import *
 from buttons import *
 from inventory import *
+import time
 
 
 class Game:
     def __init__(self):
         pg.init()
         self.finished = False
-        self.screen = pg.display.set_mode((width, height))
+        self.screen = pg.display.set_mode((screen_width, screen_height))
         self.drawer = visual.Drawer(self.screen)
         self.world = World(-1)
         spawn_block_x, spawn_block_y = self.world.get_block(hero_spawn_x, hero_spawn_y)
@@ -21,13 +22,11 @@ class Game:
         self.hero = Hero(spawn_block.x, spawn_block.y)
         self.clock = pg.time.Clock()
         self.inventory = Inventory(self.screen)
-        self.game_status = "Main menu"
         self.background = pygame.transform.scale(LABaria_pict, (1200, 800))
         self.start_button = Button(350, 200, start_img_off, start_img_on, 1)
-        self.load_save_button = Button(350, 400, load_save_img_off, load_save_img_on, 1)
-        self.back_button = Button(350, 200, back_img_off, back_img_on, 1)
-        self.save_game_button = Button(350, 400, save_game_img_off, save_game_img_on, 1)
+        self.load_save_button = Button(350, 400, load_save_off, load_save_on, 1)
         self.exit_button = Button(350, 600, exit_img_off, exit_img_on, 1)
+        self.game_status = GameStatus.in_main_menu
 
     def world_move_general(self, keys):
 
@@ -48,101 +47,80 @@ class Game:
         if self.world.will_collide_with_rect(self.world.vx, 0, self.hero.rect):
             self.world.vx = 0
         if self.world.will_collide_with_rect(0, self.world.vy, self.hero.rect):
-            if self.world.vy < 0:
+            if self.world.will_collide_with_rect(0, -g, self.hero.rect):  # Проверяет можно ли еще чуть сместить героя
                 self.hero.falling = False
             self.world.vy = 0
         else:
             self.hero.falling = True
-        self.hero.set_animation(self.world.vx)
         self.world.move()
 
-    def click_handler(self):
-        """Обрабатывает кнопки"""
+    def break_block(self, block_x, block_y):
+        block = self.world.map[block_y][block_x]
+        s = time.time()
+        if block.breaking_time is not None:
+            if self.hero.breaking_block == block:
+                if s - self.hero.breaking_start_time >= block_breaking_time[block.type]:
+                    self.world.remove_block(block_x, block_y)
+                    self.stop_break_block()
+                else:
+                    degree = (s - self.hero.breaking_start_time) / block_breaking_time[block.type]
+                    block.set_transparency_level(degree * 0.4)
+            else:
+                self.stop_break_block()
+                self.hero.breaking_block = block
+                self.hero.breaking_start_time = s
+        else:
+            self.stop_break_block()
+
+    def stop_break_block(self):
+        if self.hero.breaking_block is not None:  # Останвливает ломание блока
+            self.hero.breaking_block.set_transparency_level(0)
+            self.hero.breaking_block = None
+            self.hero.breaking_start_time = None
+
+    def main_menu_activity(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.finished = True
-        if self.game_status == "Main menu":
-            self.screen.blit(self.background, (0, 0))
-            self.start_button.draw_on(self.screen)
-            self.exit_button.draw_on(self.screen)
-            self.load_save_button.draw_on(self.screen)
-            if self.start_button.collide(self.screen):
-                self.game_status = "In game"
-            if self.exit_button.collide(self.screen):
-                self.finished = True
-            if self.load_save_button.collide(self.screen):
-                print("In progress...")
-        if self.game_status == "Pause":
-            self.back_button.clicked = False
-            self.screen.blit(self.background, (0, 0))
-            self.back_button.draw_on(self.screen)
-            if self.back_button.collide(self.screen):
-                self.game_status = "In game"
-            self.exit_button.draw_on(self.screen)
-            if self.exit_button.collide(self.screen):
-                self.finished = True
-            self.save_game_button.draw_on(self.screen)
-            if self.save_game_button.collide(self.screen):
-                print("Введите название сохранения:")
-                name = input()
-                self.save(name)
-            for event in pg.event.get():
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_ESCAPE:
-                        self.game_status = "In game"
+        self.screen.blit(self.background, (0, 0))
+        self.start_button.draw_on(self.screen)
+        self.exit_button.draw_on(self.screen)
+        self.load_save_button.draw_on(self.screen)
+        self.start_button.collide(self.screen)
+        if self.exit_button.collide(self.screen):
+            self.finished = True
+        if self.load_save_button.collide(self.screen):
+            print("In progress...")
         pygame.display.update()
 
-    def save(self, name):
-        """Сохраняет мир в файл"""
-        file = open(f'saves/{name}', 'a')
-        try:
-            for rows in self.world.map:
-                for block in rows:
-                    file.write(f'{block.x}_{block.y}_{block.type} ')
-                file.write('$')
-        finally:
-            file.close()
+    def event_handler(self, events):
+        for event in events:
+            if event.type == pg.QUIT:
+                self.finished = True
+            if event.type == pg.MOUSEBUTTONUP and event.button == pg.BUTTON_LEFT:
+                self.stop_break_block()
 
-    def download(self, name):
-        """Скачивает мир из файла"""
-        i = 0
-        j = 0
-        file = open(f'saves/{name}', 'r')
-        try:
-            text = file.read()
-            text = text.split('$')
-            for string in text:
-                string = string.split()
-                for ministring in string:
-                    ministring = ministring.split('_')
-                    self.world.map[i][j].x = float(ministring[0])
-                    self.world.map[i][j].y = float(ministring[1])
-                    self.world.map[i][j].type = int(float(ministring[2]))
-                    j += 1
-                j = 0
-                i += 1
-        finally:
-            file.close()
+        if pg.mouse.get_pressed()[0]:
+            destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
+            d_block = self.world.map[destroy_y][destroy_x]
+            if (d_block.x - self.hero.x) ** 2 + (d_block.y - self.hero.y) ** 2 <= hero_dig_range ** 2:
+                self.break_block(destroy_x, destroy_y)
+            else:
+                self.stop_break_block()
+        self.world_move_general(pg.key.get_pressed())
+        self.hero.set_animation(self.world.vx)
 
     def run(self):
         while not self.finished:
-            if self.game_status != "In game":
-                self.click_handler()
-            elif self.game_status == "In game":
-                self.clock.tick(60)
-                for event in pg.event.get():
-                    if event.type == pg.QUIT:
-                        self.finished = True
-                    if event.type == pg.MOUSEBUTTONDOWN:
-                        destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
-                        self.world.brake_block(destroy_x, destroy_y)
-                    if event.type == pg.KEYDOWN:
-                        if event.key == pg.K_ESCAPE:
-                            self.game_status = "Pause"
-                self.world_move_general(pg.key.get_pressed())
+            if self.start_button.clicked:
+                self.game_status = GameStatus.in_game
+            if self.game_status == GameStatus.in_game:
+                self.clock.tick(90)
+                self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
+            if self.game_status == GameStatus.in_main_menu:
+                self.main_menu_activity()
 
 
 if __name__ == "__main__":
     Game().run()
-
