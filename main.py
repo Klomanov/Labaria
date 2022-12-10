@@ -8,6 +8,7 @@ from hero import *
 from buttons import *
 from inventory import *
 import time
+import os
 
 
 class Game:
@@ -27,6 +28,8 @@ class Game:
         self.load_save_button = Button(350, 400, load_save_off, load_save_on, 1)
         self.exit_button = Button(350, 600, exit_img_off, exit_img_on, 1)
         self.game_status = GameStatus.in_main_menu
+        self.back_button = Button(350, 200, back_img_off, back_img_on, 1)
+        self.save_game_button = Button(350, 400, save_game_img_off, save_game_img_on, 1)
 
     def world_move_general(self, keys):
 
@@ -86,12 +89,79 @@ class Game:
         self.start_button.draw_on(self.screen)
         self.exit_button.draw_on(self.screen)
         self.load_save_button.draw_on(self.screen)
-        self.start_button.collide(self.screen)
+        if self.start_button.collide(self.screen):
+            self.game_status = GameStatus.in_game
         if self.exit_button.collide(self.screen):
             self.finished = True
         if self.load_save_button.collide(self.screen):
-            print("In progress...")
+            print("Введите название сохранения:")
+            name = input()
+            files = os.listdir('saves')
+            if name in files:
+                self.download(name)
+                self.game_status = GameStatus.in_game
+            else:
+                print("Сохранение не найдено.")
+        else:
+            self.load_save_button.clicked = False
         pygame.display.update()
+
+    def pause_activity(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.finished = True
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                self.game_status = GameStatus.in_game
+        self.back_button.clicked = False
+        self.save_game_button.clicked = False
+        self.screen.blit(self.background, (0, 0))
+        self.back_button.draw_on(self.screen)
+        if self.back_button.collide(self.screen):
+            self.game_status = GameStatus.in_game
+        self.exit_button.draw_on(self.screen)
+        if self.exit_button.collide(self.screen):
+            self.finished = True
+        self.save_game_button.draw_on(self.screen)
+        if self.save_game_button.collide(self.screen):
+            print("Введите название сохранения:")
+            name = input()
+            files = os.listdir('saves')
+            if name in files:
+                print('Это название уже занято. Используйте другое название.')
+            else:
+                self.save(name)
+                print('Файл сохранён.')
+        pygame.display.update()
+
+    def save(self, name):
+        """Сохраняет мир в файл"""
+        file = open(f'saves/{name}', 'a')
+        try:
+            for rows in self.world.map:
+                for block in rows:
+                    file.write(f'{block.x}_{block.y}_{block.type} ')
+                file.write('$')
+        finally:
+            file.close()
+
+    def download(self, name):
+        """Скачивает мир из файла"""
+        i = 0
+        j = 0
+        file = open(f'saves/{name}', 'r')
+        try:
+            text = file.read()
+            text = text.split('$')
+            for string in text:
+                string = string.split()
+                for ministring in string:
+                    ministring = ministring.split('_')
+                    self.world.map[i][j] = Block(float(ministring[0]), float(ministring[1]), int(float(ministring[2])))
+                    j += 1
+                j = 0
+                i += 1
+        finally:
+            file.close()
 
     def event_handler(self, events):
         for event in events:
@@ -99,6 +169,9 @@ class Game:
                 self.finished = True
             if event.type == pg.MOUSEBUTTONUP and event.button == pg.BUTTON_LEFT:
                 self.stop_break_block()
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    self.game_status = GameStatus.in_pause
 
         if pg.mouse.get_pressed()[0]:
             destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
@@ -112,14 +185,14 @@ class Game:
 
     def run(self):
         while not self.finished:
-            if self.start_button.clicked:
-                self.game_status = GameStatus.in_game
+            if self.game_status == GameStatus.in_main_menu:
+                self.main_menu_activity()
             if self.game_status == GameStatus.in_game:
                 self.clock.tick(90)
                 self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
-            if self.game_status == GameStatus.in_main_menu:
-                self.main_menu_activity()
+            if self.game_status == GameStatus.in_pause:
+                self.pause_activity()
 
 
 if __name__ == "__main__":

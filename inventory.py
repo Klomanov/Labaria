@@ -37,8 +37,8 @@ class Inventory(visual.DrawableObject):
         self.screen.blit(f, (x, y))
 
     def draw_on(self, screen):
-        x = (width - 290)/2 + 10
-        y = height - 140 + 10
+        x = (screen_width - 290)/2 + 10
+        y = screen_height - 140 + 10
         side = 60
         step = 70
 
