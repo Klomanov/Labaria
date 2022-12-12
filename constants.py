@@ -125,14 +125,17 @@ block_bg = {BlockType.grass: BlockType.bg_dirt,
 
 
 class ResourceType:
-    grass = 1
+    grass = 0
     dirt = 1
     stone = 2
 
 
-resource_images = {ResourceType.grass: pg.image.load("textures/tile_grass.jpg"),
-                   ResourceType.dirt: pg.image.load("textures/tile_dirt.png"),
-                   ResourceType.stone: pg.image.load("textures/tile_stone.png"), }
+resource = [ResourceType.grass, ResourceType.dirt, ResourceType.stone]
+
+
+resource_images = {ResourceType.grass: pg.image.load("textures/grass_inventory.png"),
+                   ResourceType.dirt: pg.image.load("textures/dirt_inventory.png"),
+                   ResourceType.stone: pg.image.load("textures/stone_inventory.png")}
 
 
 class GameStatus:
