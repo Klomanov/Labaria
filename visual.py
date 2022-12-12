@@ -14,9 +14,10 @@ class Drawer:
         :return:
         """
         self.screen.fill((0, 0, 0))
-        for row in world:
-            for block in row:
-                block.draw_on(self.screen)
+        for chunk in world:
+            for row in chunk:
+                for block in row:
+                    block.draw_on(self.screen)
         hero.draw_on(self.screen)
         inventory.draw_on(self.screen)
         pg.display.update()
