@@ -7,9 +7,9 @@ font_size = 24
 
 g = 1  # ускорение свободного падения
 
-# Ширина карты мира
-chunk_size = 50
-world_size_x = chunk_size * 3  # Ширина карты мира. Устанавливать кратным 3 (количество чанков)
+chunk_num = 4  # Нельзя менять!!!
+chunk_size: int = 30
+world_size_x = chunk_size * chunk_num
 world_size_y = screen_height // block_size + 50  # Высота карты мира
 sky_level = world_size_y - world_size_y // 3  # s Уровень неба
 
@@ -19,7 +19,7 @@ hero_width = 1.75 * block_size  # Геометрические размеры г
 hero_height = 2 * block_size
 hero_speed = 4  # Кинематические свойства героя (в целых числах все нужно указывать)
 hero_jump_power = 20
-hero_dig_range = 2.3 * block_size
+hero_dig_range = 3 * block_size
 
 perlin_octaves = 1.5  # Зернистость генерации мира
 

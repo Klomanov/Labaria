@@ -189,7 +189,7 @@ class Game:
             if self.game_status == GameStatus.in_main_menu:
                 self.main_menu_activity()
             if self.game_status == GameStatus.in_game:
-                self.clock.tick(30)
+                self.clock.tick(40)
                 self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
             if self.game_status == GameStatus.in_pause:
