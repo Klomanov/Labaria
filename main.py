@@ -9,6 +9,8 @@ from buttons import *
 from inventory import *
 import time
 import os
+import pickle
+from  world_cutted import *
 
 
 class Game:
@@ -31,6 +33,7 @@ class Game:
         self.save_game_button = Button(350, 400, save_game_img_off, save_game_img_on, 1)
         self.files = os.listdir('saves')
         self.saves = []
+        self.need_to_blit = True
 
     def world_move_general(self, keys):
         """Функция, которая осуществляет движение мира с помощью других функций в world.py"""
@@ -103,6 +106,7 @@ class Game:
         if self.load_save_button.collide(self.screen):
             self.game_status = GameStatus.in_saves
             self.saves[1].clicked = True
+            self.load_save_button.clicked = False
 #            print("Введите название сохранения:")
 #            name = input()
 #            files = os.listdir('saves')
@@ -122,7 +126,11 @@ class Game:
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 self.game_status = GameStatus.in_game
         self.back_button.clicked = False
-        self.screen.blit(self.background, (0, 0))
+        if self.need_to_blit == True:
+            back1 = self.background
+            back1.set_alpha(50)
+            self.screen.blit(back1, (0, 0))
+            self.need_to_blit = False
         self.back_button.draw_on(self.screen)
         if self.back_button.collide(self.screen):
             self.game_status = GameStatus.in_game
@@ -153,7 +161,7 @@ class Game:
             j += 1
 
     def in_saves_activity(self):
-        f1 = pg.font.SysFont('TronicaMono-Regular otf (400) font', 80)
+        f1 = pg.font.Font('DePixel/DePixelSchmal.ttf', 60)
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.finished = True
@@ -165,7 +173,8 @@ class Game:
         i = 220
         for k in range(len(self.saves)):
             self.saves[k].draw_on(self.screen)
-            self.screen.blit(f1.render(self.files[k], False, (0, 0, 0)), (400, i))
+            left_pos = 600-f1.render(self.files[k], False, (0, 0, 0)).get_width()/2
+            self.screen.blit(f1.render(self.files[k], False, (0, 0, 0)), (left_pos, i))
             i += 200
             if self.saves[k].collide(self.screen):
                 self.download_game(self.files[k])
@@ -174,38 +183,52 @@ class Game:
 
     def save_game(self, name):
         """Сохраняет мир в файл"""
-        file = open(f'saves/{name}', 'a')
+        file = open(f'saves/{name}', 'wb')
         try:
-            for chunks in self.world.map:
-                for rows in chunks:
-                    for block in rows:
-                        file.write(f'{block.x}_{block.y}_{block.type} ')
-                    file.write('$')
-                file.write('%')
+#            for chunks in self.world.map:
+#                for rows in chunks:
+#                    for block in rows:
+#                        file.write(f'{block.x}_{block.y}_{block.type} ')
+#                    file.write('$')
+#                file.write('%')
+            pickled_map = []
+            for i in range(len(self.world.map)):
+                pickled_map.append([])
+                for j in range(len(self.world.map[i])):
+                    pickled_map[i].append([])
+                    for k in range(len(self.world.map[i][j])):
+                        pickled_block = PickledBlock(self.world.map[i][j][k].x, self.world.map[i][j][k].y, self.world.map[i][j][k].type)
+                        pickled_map[i][j].append(pickled_block)
+            pickle.dump(pickled_map, file)
         finally:
             file.close()
 
     def download_game(self, name):
         """Скачивает мир из файла"""
-        i = 0
-        j = 0
-        k = 0
-        file = open(f'saves/{name}', 'r')
+#        i = 0
+#        j = 0
+#        k = 0
+        file = open(f'saves/{name}', 'rb')
         try:
-            text = file.read()
-            text = text.split('%')
-            for chunks in text:
-                chunks = chunks.split('$')
-                for string in chunks:
-                    string = string.split()
-                    for ministring in string:
-                        ministring = ministring.split('_')
-                        self.world.map[k][i][j] = Block(float(ministring[0]), float(ministring[1]), int(float(ministring[2])))
-                        j += 1
-                    j = 0
-                    i += 1
-                i = 0
-                k += 1
+#            text = file.read()
+#            text = text.split('%')
+#            for chunks in text:
+#                chunks = chunks.split('$')
+#                for string in chunks:
+#                    string = string.split()
+#                    for ministring in string:
+#                       ministring = ministring.split('_')
+ #                       self.world.map[k][i][j] = Block(float(ministring[0]), float(ministring[1]), int(float(ministring[2])))
+ #                       j += 1
+ #                   j = 0
+  #                  i += 1
+   #             i = 0
+    #            k += 1
+            map_converted = pickle.load(file)
+            for i in range(len(map_converted)):
+                for j in range(len(map_converted[i])):
+                    for k in range(len(map_converted[i][j])):
+                        self.world.map[i][j][k] = Block(map_converted[i][j][k].x, map_converted[i][j][k].y, map_converted[i][j][k].type)
         finally:
             file.close()
 

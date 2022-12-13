@@ -18,10 +18,15 @@ class Button(visual.DrawableObject):
 
     def draw_on(self, surface):
         """Рисует кнопку"""
+        f1 = pg.font.Font('DePixel/DePixelSchmal.ttf', 60)
         if self.collided:
             surface.blit(self.image_on, (self.rect.x, self.rect.y))
+#            left_pos = 600-f1.render('Back', False, (0, 0, 0)).get_width()/2
+#            surface.blit(f1.render('Back', False, (0, 0, 0)), (left_pos, 200))
         else:
             surface.blit(self.image_off, (self.rect.x, self.rect.y))
+#            left_pos = 600-f1.render('Back', False, (0, 0, 0)).get_width()/2
+#            surface.blit(f1.render('Back', False, (0, 0, 0)), (left_pos, 200))
 
     def collide(self, surface):
         action = False
