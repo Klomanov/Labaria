@@ -176,10 +176,12 @@ class Game:
         """Сохраняет мир в файл"""
         file = open(f'saves/{name}', 'a')
         try:
-            for rows in self.world.map:
-                for block in rows:
-                    file.write(f'{block.x}_{block.y}_{block.type} ')
-                file.write('$')
+            for chunks in self.world.map:
+                for rows in chunks:
+                    for block in rows:
+                        file.write(f'{block.x}_{block.y}_{block.type} ')
+                    file.write('$')
+                file.write('%')
         finally:
             file.close()
 
@@ -187,18 +189,23 @@ class Game:
         """Скачивает мир из файла"""
         i = 0
         j = 0
+        k = 0
         file = open(f'saves/{name}', 'r')
         try:
             text = file.read()
-            text = text.split('$')
-            for string in text:
-                string = string.split()
-                for ministring in string:
-                    ministring = ministring.split('_')
-                    self.world.map[i][j] = Block(float(ministring[0]), float(ministring[1]), int(float(ministring[2])))
-                    j += 1
-                j = 0
-                i += 1
+            text = text.split('%')
+            for chunks in text:
+                chunks = chunks.split('$')
+                for string in chunks:
+                    string = string.split()
+                    for ministring in string:
+                        ministring = ministring.split('_')
+                        self.world.map[k][i][j] = Block(float(ministring[0]), float(ministring[1]), int(float(ministring[2])))
+                        j += 1
+                    j = 0
+                    i += 1
+                i = 0
+                k += 1
         finally:
             file.close()
 
