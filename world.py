@@ -21,6 +21,14 @@ class World:
         self.__init_caves()
 
     def generate_perlin_noise(self, dim, layers_num, octaves_arr, coefficient_arr):
+        """
+        Генерирует зацикленный dim-мерный шум Перлина по чанкам
+        :param dim: 2-3 размерность
+        :param layers_num: количество слоев шума
+        :param octaves_arr: зернистость каждого слоя
+        :param coefficient_arr: степень влияния каждого слоя в виде коэф.
+        :return: массив из 4 чанков с шумом Перлина
+        """
         noises = []
         if self.seed == -1:
             for i in range(layers_num):
@@ -30,43 +38,57 @@ class World:
                 noises.append(PerlinNoise(perlin_octaves*octaves_arr[i], seed=self.seed))
         perlin_map = []
         if dim == 2:
-            for y in range(world_size_y):
-                perlin_map.append([])
-                for x in range(world_size_x):
-                    value = noises[0]([x / world_size_x, y / world_size_y]) * coefficient_arr[0]
-                    for i in range(1, len(noises)):
-                        value += noises[i]([x / world_size_x, y / world_size_y]) * coefficient_arr[i]
-                    perlin_map[y].append(value)
+            perlin_map = [[], [], [], []]
+            for x in range(chunk_size):
+                value = noises[0]([x / chunk_size, 0]) * coefficient_arr[0]
+                for i in range(1, len(noises)):
+                    value += noises[i]([x / chunk_size, 0]) * coefficient_arr[i]
+                perlin_map[0].append(value)
+            for x in range(chunk_size):
+                value = noises[0]([1, x/chunk_size]) * coefficient_arr[0]
+                for i in range(1, len(noises)):
+                    value += noises[i]([x / chunk_size, 0]) * coefficient_arr[i]
+                perlin_map[1].append(value)
+            for x in range(chunk_size):
+                value = noises[0]([1 - x / chunk_size, 1]) * coefficient_arr[0]
+                for i in range(1, len(noises)):
+                    value += noises[i]([x / chunk_size, 0]) * coefficient_arr[i]
+                perlin_map[2].append(value)
+            for x in range(chunk_size):
+                value = noises[0]([0, 1 - x / chunk_size]) * coefficient_arr[0]
+                for i in range(1, len(noises)):
+                    value += noises[i]([x / chunk_size, 0]) * coefficient_arr[i]
+                perlin_map[3].append(value)
         if dim == 3:
             perlin_map = [[], [], [], []]
-            for y in range(world_size_y):
+            for x in range(chunk_size):
                 perlin_map[0].append([])
-                for x in range(chunk_size):
-                    value = noises[0]([0, y / world_size_y, x / chunk_size]) * coefficient_arr[0]
+                for y in range(world_size_y):
+                    value = noises[0]([x / chunk_size, y / world_size_y, 0, ]) * coefficient_arr[0]
                     for i in range(1, len(noises)):
-                        value += noises[i]([0, y / world_size_y, x / chunk_size]) * coefficient_arr[i]
-                    perlin_map[0][y].append(value)
-            for y in range(world_size_y):
+                        value += noises[i]([x / chunk_size, y / world_size_y, 0, ]) * coefficient_arr[i]
+                    perlin_map[0][x].append(value)
+            for x in range(chunk_size):
                 perlin_map[1].append([])
-                for x in range(chunk_size):
-                    value = noises[0]([ x/chunk_size, y / world_size_y, 0]) * coefficient_arr[0]
+                for y in range(world_size_y):
+                    value = noises[0]([1, y / world_size_y, x/chunk_size, ]) * coefficient_arr[0]
                     for i in range(1, len(noises)):
-                        value += noises[i]([x/chunk_size, y / world_size_y,  0]) * coefficient_arr[i]
-                    perlin_map[1][y].append(value)
-            for y in range(world_size_y):
+                        value += noises[i]([1, y / world_size_y, x/chunk_size, ]) * coefficient_arr[i]
+                    perlin_map[1][x].append(value)
+            for x in range(chunk_size):
                 perlin_map[2].append([])
-                for x in range(chunk_size):
-                    value = noises[0]([1, y / world_size_y,  x/chunk_size]) * coefficient_arr[0]
+                for y in range(world_size_y):
+                    value = noises[0]([1 - x/chunk_size, y / world_size_y,  1]) * coefficient_arr[0]
                     for i in range(1, len(noises)):
-                        value += noises[i]([1, y / world_size_y,  x/chunk_size]) * coefficient_arr[i]
-                    perlin_map[2][y].append(value)
-            for y in range(world_size_y):
+                        value += noises[i]([1 - x/chunk_size, y / world_size_y,  1]) * coefficient_arr[i]
+                    perlin_map[2][x].append(value)
+            for x in range(chunk_size):
                 perlin_map[3].append([])
-                for x in range(chunk_size):
-                    value = noises[0]([x/chunk_size, y / world_size_y,  1]) * coefficient_arr[0]
+                for y in range(world_size_y):
+                    value = noises[0]([0, y / world_size_y, 1-x/chunk_size]) * coefficient_arr[0]
                     for i in range(1, len(noises)):
-                        value += noises[i]([x/chunk_size, y / world_size_y,  1]) * coefficient_arr[i]
-                    perlin_map[3][y].append(value)
+                        value += noises[i]([0, y / world_size_y, 1-x/chunk_size]) * coefficient_arr[i]
+                    perlin_map[3][x].append(value)
             # fig, (ax1, ax2, ax3, ax4) = plt.subplots(4)
             # ax1.imshow(perlin_map[0], cmap='gray')
             # ax2.imshow(perlin_map[1], cmap='gray')
@@ -91,7 +113,7 @@ class World:
 
     def __init_caves(self):
 
-        caves = self.generate_perlin_noise(3, 2, [1, 1], [1, 0.3])
+        caves = self.generate_perlin_noise(3, 10, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 2, 1, 1, 1, 1, 1, 1, 1, 1])
 
         for z in range(chunk_num):
             for x in range(chunk_size):
@@ -99,8 +121,8 @@ class World:
                 for y in range(world_size_y):
                     if self.map[z][y][x].type == BlockType.grass: grass_y = y
                     if grass_y is not None and y >= grass_y:
-                        value = caves[z][y][x]
-                        if round(value * 10) == 1:
+                        value = abs(caves[z][x][y])
+                        if value*caves_frequency <= 1:
                             self.map[z][y][x] = Block(self.map[z][y][x].x, self.map[z][y][x].y, block_bg[self.map[z][y][x].type])
 
     def __init_sky(self):
@@ -116,70 +138,30 @@ class World:
         Инициализирует первичный ландшафт с помощью шума Перлина.
         :return: массив мира
         """
-        ground_level_noise = self.generate_perlin_noise(2, 2, [1, 6], [1, 0.4])
+        ground_level_noise = self.generate_perlin_noise(2, 2, [1, 3], [1, 0.3])
 
         # plt.imshow(ground_level_noise, cmap='gray')
         # plt.show()
 
-        # Причину, по которой нужен этот ужас, я не смогу уместить в комментарии. Грубо говоря, здесь делается
-        # бесшовный ландшафкт для каждого чанка
-        for x in range(chunk_size):
-            y = round(sky_level - abs(ground_level_noise[0][x] * 15))
-            self.map[0][y][x] = Block(self.map[0][y][x].x, self.map[0][y][x].y, BlockType.grass)
-            for ny in range(y + 1, world_size_y):
-                self.map[0][ny][x] = Block(self.map[0][ny][x].x, self.map[0][ny][x].y, BlockType.dirt)
-        for x in range(chunk_size):
-            y = round(sky_level - abs(ground_level_noise[x][chunk_size] * 15))
-            self.map[1][y][x] = Block(self.map[1][y][x].x, self.map[1][y][x].y, BlockType.grass)
-            for ny in range(y + 1, world_size_y):
-                self.map[1][ny][x] = Block(self.map[1][ny][x].x, self.map[1][ny][x].y, BlockType.dirt)
-        for x in range(chunk_size):
-            y = round(sky_level - abs(ground_level_noise[chunk_size][chunk_size-x] * 15))
-            self.map[2][y][x] = Block(self.map[2][y][x].x, self.map[2][y][x].y, BlockType.grass)
-            for ny in range(y + 1, world_size_y):
-                self.map[2][ny][x] = Block(self.map[2][ny][x].x, self.map[2][ny][x].y, BlockType.dirt)
-        for x in range(chunk_size):
-            y = round(sky_level - abs(ground_level_noise[chunk_size - x][0] * 15))
-            self.map[3][y][x] = Block(self.map[3][y][x].x, self.map[3][y][x].y, BlockType.grass)
-            for ny in range(y + 1, world_size_y):
-                self.map[3][ny][x] = Block(self.map[3][ny][x].x, self.map[3][ny][x].y, BlockType.dirt)
+        for z in range(chunk_num):
+            for x in range(chunk_size):
+                y = round(sky_level - abs(ground_level_noise[z][x] * 15))
+                self.map[z][y][x] = Block(self.map[z][y][x].x, self.map[z][y][x].y, BlockType.grass)
+                for ny in range(y + 1, world_size_y):
+                    self.map[z][ny][x] = Block(self.map[z][ny][x].x, self.map[z][ny][x].y, BlockType.dirt)
 
     def __init_stone(self):
-
         stone_level_noise = self.generate_perlin_noise(2, 2, [1, 2], [1, 0.9])
 
-        for x in range(chunk_size):
-            grass_y = None
-            for y in range(world_size_y):
-                if self.map[0][y][x].type == BlockType.grass: grass_y = y
-            stone_y = round(grass_y + 2 + abs(stone_level_noise[0][x] * 12))
-            self.map[0][stone_y][x] = Block(self.map[0][stone_y][x].x, self.map[0][stone_y][x].y, BlockType.stone)
-            for ny in range(stone_y + 1, world_size_y):
-                self.map[0][ny][x] = Block(self.map[0][ny][x].x, self.map[0][ny][x].y, BlockType.stone)
-        for x in range(chunk_size):
-            grass_y = None
-            for y in range(world_size_y):
-                if self.map[1][y][x].type == BlockType.grass: grass_y = y
-            stone_y = round(grass_y + 2 + abs(stone_level_noise[x][chunk_size] * 12))
-            self.map[1][stone_y][x] = Block(self.map[1][stone_y][x].x, self.map[1][stone_y][x].y, BlockType.stone)
-            for ny in range(stone_y + 1, world_size_y):
-                self.map[1][ny][x] = Block(self.map[1][ny][x].x, self.map[1][ny][x].y, BlockType.stone)
-        for x in range(chunk_size):
-            grass_y = None
-            for y in range(world_size_y):
-                if self.map[2][y][x].type == BlockType.grass: grass_y = y
-            stone_y = round(grass_y + 2 + abs(stone_level_noise[chunk_size][chunk_size - x] * 12))
-            self.map[2][stone_y][x] = Block(self.map[2][stone_y][x].x, self.map[2][stone_y][x].y, BlockType.stone)
-            for ny in range(stone_y + 1, world_size_y):
-                self.map[2][ny][x] = Block(self.map[2][ny][x].x, self.map[2][ny][x].y, BlockType.stone)
-        for x in range(chunk_size):
-            grass_y = None
-            for y in range(world_size_y):
-                if self.map[3][y][x].type == BlockType.grass: grass_y = y
-            stone_y = round(grass_y + 2 + abs(stone_level_noise[chunk_size - x][0] * 12))
-            self.map[3][stone_y][x] = Block(self.map[3][stone_y][x].x, self.map[3][stone_y][x].y, BlockType.stone)
-            for ny in range(stone_y + 1, world_size_y):
-                self.map[3][ny][x] = Block(self.map[3][ny][x].x, self.map[3][ny][x].y, BlockType.stone)
+        for z in range(chunk_num):
+            for x in range(chunk_size):
+                grass_y = None
+                for y in range(world_size_y):
+                    if self.map[z][y][x].type == BlockType.grass: grass_y = y
+                stone_y = round(grass_y + 2 + abs(stone_level_noise[z][x] * 12))
+                self.map[z][stone_y][x] = Block(self.map[z][stone_y][x].x, self.map[z][stone_y][x].y, BlockType.stone)
+                for ny in range(stone_y + 1, world_size_y):
+                    self.map[z][ny][x] = Block(self.map[z][ny][x].x, self.map[z][ny][x].y, BlockType.stone)
 
     def __init_surface(self):
         for x in range(world_size_x):

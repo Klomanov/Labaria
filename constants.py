@@ -12,11 +12,12 @@ chunk_size: int = 30
 world_size_x = chunk_size * chunk_num
 world_size_y = screen_height // block_size + 50  # Высота карты мира
 sky_level = world_size_y - world_size_y // 3  # s Уровень неба
+caves_frequency = 6.5  # Частота пещер
 
 hero_spawn_x = screen_width // 2  # Место спавна героя
 hero_spawn_y = screen_height // 2
 hero_width = 1.75 * block_size  # Геометрические размеры героя
-hero_height = 2 * block_size
+hero_height = 1.95 * block_size
 hero_speed = 4  # Кинематические свойства героя (в целых числах все нужно указывать)
 hero_jump_power = 20
 hero_dig_range = 3 * block_size
