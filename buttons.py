@@ -40,7 +40,7 @@ def button_main():
     """Функция для тестирования"""
     LABaria = pygame.transform.scale(LABaria_pict, (1200, 800))
     start_button = Button(350, 200, start_img_off, start_img_on, 1)
-    load_save_button = Button(350, 400, load_save_off, load_save_on, 1)
+    load_save_button = Button(350, 400, load_save_img_off, load_save_img_on, 1)
     exit_button = Button(350, 600, exit_img_off, exit_img_on, 1)
     screen = pygame.display.set_mode((1200, 800))
     pygame.display.set_caption('Buttons')

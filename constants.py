@@ -7,19 +7,20 @@ font_size = 24
 
 g = 1  # ускорение свободного падения
 
-# Ширина карты мира
-external_world_size = 100
-world_size_x = screen_width // block_size + external_world_size  # Ширина карты мира
+chunk_num = 4  # Нельзя менять!!!
+chunk_size: int = 30
+world_size_x = chunk_size * chunk_num
 world_size_y = screen_height // block_size + 50  # Высота карты мира
 sky_level = world_size_y - world_size_y // 3  # s Уровень неба
+caves_frequency = 6.5  # Частота пещер
 
 hero_spawn_x = screen_width // 2  # Место спавна героя
 hero_spawn_y = screen_height // 2
 hero_width = 1.75 * block_size  # Геометрические размеры героя
-hero_height = 2 * block_size
-hero_speed = 3  # Кинематические свойства героя (в целых числах все нужно указывать)
+hero_height = 1.95 * block_size
+hero_speed = 4  # Кинематические свойства героя (в целых числах все нужно указывать)
 hero_jump_power = 20
-hero_dig_range = 2.3 * block_size
+hero_dig_range = 3 * block_size
 
 perlin_octaves = 1.5  # Зернистость генерации мира
 
@@ -197,3 +198,7 @@ exit_img_off = pg.image.load("menu/button_exit_off.png")
 load_save_on = pg.image.load("menu/button_load_save_on.png")
 load_save_off = pg.image.load("menu/button_load_save_off.png")
 LABaria_pict = pg.image.load("menu/LABaria.png")
+back_img_off = pg.image.load("menu/button_back_off.png")
+back_img_on = pg.image.load("menu/button_back_on.png")
+save_game_img_off = pg.image.load("menu/button_save_game_off.png")
+save_game_img_on = pg.image.load("menu/button_save_game_on.png")
