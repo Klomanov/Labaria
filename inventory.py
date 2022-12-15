@@ -7,7 +7,7 @@ class Resource:
     def __init__(self, name, image):
         self.name = name
         self.amount = 0
-        self.image = image
+        self.image = pg.transform.scale(image, (block_size, block_size))
 
 
 class Inventory(visual.DrawableObject):
