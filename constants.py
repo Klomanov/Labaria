@@ -10,9 +10,13 @@ g = 1  # ускорение свободного падения
 chunk_num = 4  # Нельзя менять!!!
 chunk_size: int = 30
 world_size_x = chunk_size * chunk_num
-world_size_y = screen_height // block_size + 50  # Высота карты мира
-sky_level = world_size_y - world_size_y // 3  # s Уровень неба
-caves_frequency = 6.5  # Частота пещер
+world_size_y = screen_height // block_size + 80  # Высота карты мира
+sky_level = 30  # s Уровень неба
+bedrock_level = world_size_y - 15  # Уровень коренной породы
+
+caves_frequency = 1  # Частота пещер
+tree_frequency = 1  # Частота деревьев
+decorations_frequency = 1  # Частота декораций
 
 hero_spawn_x = screen_width // 2  # Место спавна героя
 hero_spawn_y = screen_height // 2
@@ -44,6 +48,15 @@ class BlockType:
     leaves_left_top = 15
     leaves_middle_top = 16
     leaves_right_top = 17
+    bedrock = 18
+    dec_grass1 = 19
+    dec_grass2 = 20
+    dec_grass3 = 21
+    dec_grass4 = 22
+    dec_mushroom_brown = 23
+    dec_mushroom_red = 24
+    dec_rock = 25
+    dec_rock_moss = 26
 
 
 block_images = {BlockType.grass: pg.image.load("textures/tile_grass.jpg"),
@@ -63,7 +76,16 @@ block_images = {BlockType.grass: pg.image.load("textures/tile_grass.jpg"),
                 BlockType.leaves_right_middle: pg.image.load("textures/tree/tile_leaves_right_middle.png"),
                 BlockType.leaves_left_top: pg.image.load("textures/tree/tile_leaves_left_top.png"),
                 BlockType.leaves_middle_top: pg.image.load("textures/tree/tile_leaves_middle_top.png"),
-                BlockType.leaves_right_top: pg.image.load("textures/tree/tile_leaves_right_top.png"), }
+                BlockType.leaves_right_top: pg.image.load("textures/tree/tile_leaves_right_top.png"),
+                BlockType.bedrock: pg.image.load("textures/tile_bedrock.png"),
+                BlockType.dec_grass1: pg.image.load("textures/decorations/tile_grass1.png"),
+                BlockType.dec_grass2: pg.image.load("textures/decorations/tile_grass2.png"),
+                BlockType.dec_grass3: pg.image.load("textures/decorations/tile_grass3.png"),
+                BlockType.dec_grass4: pg.image.load("textures/decorations/tile_grass4.png"),
+                BlockType.dec_mushroom_brown: pg.image.load("textures/decorations/tile_mushroom_brown.png"),
+                BlockType.dec_mushroom_red: pg.image.load("textures/decorations/tile_mushroom_red.png"),
+                BlockType.dec_rock: pg.image.load("textures/decorations/tile_rock.png"),
+                BlockType.dec_rock_moss: pg.image.load("textures/decorations/tile_rock_moss.png"),}
 
 block_breaking_time = {BlockType.grass: 0.5,  # Время в секундах на ломание блока
                        BlockType.dirt: 0.5,
@@ -83,6 +105,15 @@ block_breaking_time = {BlockType.grass: 0.5,  # Время в секундах �
                        BlockType.leaves_left_top: 0.2,
                        BlockType.leaves_middle_top: 0.2,
                        BlockType.leaves_right_top: 0.2,
+                       BlockType.bedrock: None,
+                       BlockType.dec_grass1: 0.2,
+                       BlockType.dec_grass2: 0.2,
+                       BlockType.dec_grass3: 0.2,
+                       BlockType.dec_grass4: 0.2,
+                       BlockType.dec_mushroom_brown: 0.2,
+                       BlockType.dec_mushroom_red: 0.2,
+                       BlockType.dec_rock: 0.2,
+                       BlockType.dec_rock_moss: 0.2,
                        }
 
 block_collisions = {BlockType.grass: True,
@@ -103,6 +134,15 @@ block_collisions = {BlockType.grass: True,
                     BlockType.leaves_left_top: False,
                     BlockType.leaves_middle_top: False,
                     BlockType.leaves_right_top: False,
+                    BlockType.bedrock: True,
+                    BlockType.dec_grass1: False,
+                    BlockType.dec_grass2: False,
+                    BlockType.dec_grass3: False,
+                    BlockType.dec_grass4: False,
+                    BlockType.dec_mushroom_brown: False,
+                    BlockType.dec_mushroom_red: False,
+                    BlockType.dec_rock: False,
+                    BlockType.dec_rock_moss: False,
                     }
 
 block_bg = {BlockType.grass: BlockType.bg_dirt,
@@ -122,21 +162,48 @@ block_bg = {BlockType.grass: BlockType.bg_dirt,
             BlockType.leaves_right_middle: BlockType.sky,
             BlockType.leaves_left_top: BlockType.sky,
             BlockType.leaves_middle_top: BlockType.sky,
-            BlockType.leaves_right_top: BlockType.sky}
+            BlockType.leaves_right_top: BlockType.sky,
+            BlockType.bedrock: BlockType.bg_stone,
+            BlockType.dec_grass1: BlockType.sky,
+            BlockType.dec_grass2: BlockType.sky,
+            BlockType.dec_grass3: BlockType.sky,
+            BlockType.dec_grass4: BlockType.sky,
+            BlockType.dec_mushroom_brown: BlockType.sky,
+            BlockType.dec_mushroom_red: BlockType.sky,
+            BlockType.dec_rock: BlockType.bg_stone,
+            BlockType.dec_rock_moss: BlockType.bg_stone,
+            }
 
 
 class ResourceType:
     grass = 0
     dirt = 1
     stone = 2
+    wood = 3
 
 
-resource = [ResourceType.grass, ResourceType.dirt, ResourceType.stone]
+block_resource = {BlockType.grass: ResourceType.dirt,
+                  BlockType.dirt: ResourceType.dirt,
+                  BlockType.stone: ResourceType.stone,
+                  BlockType.tree_bottom: ResourceType.wood,
+                  BlockType.tree_middle: ResourceType.wood,
+                  BlockType.tree_top: ResourceType.wood,
+                  BlockType.leaves_left_bottom: BlockType.sky,
+                  BlockType.leaves_middle_bottom: BlockType.sky,
+                  BlockType.leaves_right_bottom: BlockType.sky,
+                  BlockType.leaves_left_middle: BlockType.sky,
+                  BlockType.leaves_middle_middle: BlockType.sky,
+                  BlockType.leaves_right_middle: BlockType.sky,
+                  BlockType.leaves_left_top: BlockType.sky,
+                  BlockType.leaves_middle_top: BlockType.sky,
+                  BlockType.leaves_right_top: BlockType.sky}
 
+resource = [ResourceType.grass, ResourceType.dirt, ResourceType.stone, ResourceType.wood]
 
 resource_images = {ResourceType.grass: pg.image.load("textures/grass_inventory.png"),
                    ResourceType.dirt: pg.image.load("textures/dirt_inventory.png"),
-                   ResourceType.stone: pg.image.load("textures/stone_inventory.png")}
+                   ResourceType.stone: pg.image.load("textures/stone_inventory.png"),
+                   ResourceType.wood: pg.image.load("textures/wood_inventory.png")}
 
 
 class GameStatus:
