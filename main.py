@@ -17,11 +17,10 @@ class Game:
         self.finished = False
         self.screen = pg.display.set_mode((screen_width, screen_height))
         self.drawer = visual.Drawer(self.screen)
-        self.world = World(-1)
-        self.hero = Hero(screen_width//2, screen_height//2)
-        self.world.move(-world_size_x//3*block_size, 0)
         self.clock = pg.time.Clock()
-        self.inventory = Inventory(self.screen)
+        self.world = None
+        self.hero = None
+        self.inventory = None
         self.background = pygame.transform.scale(LABaria_pict, (1200, 800))
         self.start_button = Button(350, 200, start_img_off, start_img_on, 1)
         self.load_save_button = Button(350, 400, load_save_off, load_save_on, 1)
@@ -98,6 +97,10 @@ class Game:
         self.load_save_button.draw_on(self.screen)
         if self.start_button.collide(self.screen):
             self.game_status = GameStatus.in_game
+            self.world = World(-1)
+            self.hero = Hero(screen_width//2, screen_height//2)
+            self.world.move(-world_size_x//3*block_size, 0)
+            self.inventory = Inventory(self.screen)
         if self.exit_button.collide(self.screen):
             self.finished = True
         if self.load_save_button.collide(self.screen):
