@@ -32,10 +32,11 @@ class Game:
     def world_move_general(self, keys):
         """Функция, которая осуществляет движение мира с помощью других функций в world.py"""
         for chunk in range(len(self.world.map)):
-            if self.world.map[chunk][0][0].x >= screen_width + 2*block_size:
-                self.world.move_chunk_to_left(chunk)
-            elif self.world.map[chunk][0][-1].x <= -2*block_size:
-                self.world.move_chunk_to_right(chunk)
+            if visual.is_chunk_on_screen(self.world.map[chunk]):
+                if chunk == chunk_num - 1:
+                    self.world.move_left_chunk_to_right()
+                if chunk == 0:
+                    self.world.move_right_chunk_to_left()
         if keys[pygame.K_a]:
             self.world.vx = hero_speed
         if keys[pygame.K_d]:
@@ -194,7 +195,7 @@ class Game:
             if self.game_status == GameStatus.in_main_menu:
                 self.main_menu_activity()
             if self.game_status == GameStatus.in_game:
-                self.clock.tick(40)
+                self.clock.tick(60)
                 self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
             if self.game_status == GameStatus.in_pause:

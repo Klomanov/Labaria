@@ -6,6 +6,7 @@ from constants import *
 from block import Block
 import random
 from matplotlib import pyplot as plt
+import time
 
 
 class World:
@@ -181,22 +182,25 @@ class World:
                 for x in range(chunk_size):
                     if self.map[z][y][x].type == BlockType.grass:
                         if random.random() >= 0.9 / tree_frequency:
-                            height = random.randint(3, 20)
-                            if self.__can_place_tree(z, x, y, height):
+                            height = random.randint(3, 15)
+                            if self.__can_place_tree(z, x, y - 1, height):
                                 self.__build_tree(z, x, y - 1, height)
-                        if random.random() >= 0.8 / decorations_frequency and self.map[z][y - 1][x].type == BlockType.sky:
+                        if random.random() >= 0.8 / decorations_frequency and self.map[z][y - 1][
+                            x].type == BlockType.sky:
                             self.replace_block(z, x, y - 1,
                                                decorations_surface[random.randint(0, len(decorations_surface) - 1)])
 
     def __init_underground_filling(self):
         decorations_underground = [BlockType.dec_rock, BlockType.dec_rock_moss]
         for z in range(chunk_num):
-            for y in range(world_size_y-1):
+            for y in range(world_size_y - 1):
                 for x in range(chunk_size):
                     if self.map[z][y][x].type == BlockType.bg_stone:
-                        if random.random() >= 0.8 / decorations_frequency and self.map[z][y + 1][x].type == BlockType.stone:
+                        if random.random() >= 0.8 / decorations_frequency and self.map[z][y + 1][
+                            x].type == BlockType.stone:
                             self.replace_block(z, x, y,
-                                               decorations_underground[random.randint(0, len(decorations_underground) - 1)])
+                                               decorations_underground[
+                                                   random.randint(0, len(decorations_underground) - 1)])
 
     def __init_bedrock(self):
         bedrock_level_noise = self.generate_perlin_noise(2, 1, [0.5], [1])
@@ -213,7 +217,7 @@ class World:
 
     def __can_place_tree(self, chunk, bot_x, bot_y, height):
         for i in range(1, height):
-            if self.map[chunk][bot_x][bot_y - i].type != BlockType.sky:
+            if self.map[chunk][bot_y - i][bot_x].type != BlockType.sky:
                 return False
         for y in range(3):
             for x in range(3):
@@ -239,10 +243,12 @@ class World:
         :return: Block object
         """
         for chunk in range(len(self.map)):
-            for y in range(len(self.map[chunk])):
-                for x in range(len(self.map[chunk][y])):
-                    if self.map[chunk][y][x].rect.collidepoint((point_x, point_y)):
-                        return chunk, x, y
+            if visual.is_chunk_on_screen(self.map[chunk]):
+                for y in range(len(self.map[chunk])):
+                    for x in range(len(self.map[chunk][y])):
+                        if visual.is_block_on_screen(self.map[chunk][y][x]):
+                            if self.map[chunk][y][x].rect.collidepoint((point_x, point_y)):
+                                return chunk, x, y
 
     def replace_block(self, chunk, old_block_x, old_block_y, new_type):
         self.map[chunk][old_block_y][old_block_x] = Block(self.map[chunk][old_block_y][old_block_x].x,
@@ -256,6 +262,8 @@ class World:
                     block.y += round(vy)
                     block.x += round(vx)
 
+
+
     def will_collide_with_rect(self, vx, vy, rect):
         """
         Проверяет столкновение мира с объектом через фрейм c заданной скоростью
@@ -265,23 +273,31 @@ class World:
         :return: True - если столкнется, False - если нет.
         """
         for chunk in self.map:
-            for row in chunk:
-                for block in row:
-                    if block.rect.move(vx + (0.5 * vx / abs(vx) if vx != 0 else 0),
-                                       vy + (0.5 * vy / abs(vy) if vy != 0 else 0)).colliderect(
-                        rect) and block.collidable:
-                        return True
+            if visual.is_chunk_on_screen(chunk):
+                for row in chunk:
+                    for block in row:
+                        if visual.is_block_on_screen(block):
+                            if block.rect.move(vx + (0.5 * vx / abs(vx) if vx != 0 else 0),
+                                               vy + (0.5 * vy / abs(vy) if vy != 0 else 0)).colliderect(
+                                rect) and block.collidable:
+                                return True
         return False
 
     def remove_block(self, chunk, x, y):
         self.replace_block(chunk, x, y, block_bg[self.map[chunk][y][x].type])
 
-    def move_chunk_to_left(self, chunk):
-        for row in self.map[chunk]:
+    def move_right_chunk_to_left(self):
+        for row in self.map[-1]:
             for block in row:
                 block.x -= round(chunk_num * chunk_size * block_size)
+        c = self.map[-1]
+        self.map.pop(chunk_num - 1)
+        self.map.insert(0, c)
 
-    def move_chunk_to_right(self, chunk):
-        for row in self.map[chunk]:
+    def move_left_chunk_to_right(self):
+        for row in self.map[0]:
             for block in row:
                 block.x += round(chunk_num * chunk_size * block_size)
+        c = self.map[0]
+        self.map.pop(0)
+        self.map.insert(chunk_num - 1, c)
