@@ -25,12 +25,12 @@ class Game:
         self.clock = pg.time.Clock()
         self.inventory = Inventory(self.screen)
         self.background = pygame.transform.scale(LABaria_pict, (1200, 800))
-        self.start_button = Button(350, 200, start_img_off, start_img_on, 1)
-        self.load_save_button = Button(350, 400, load_save_off, load_save_on, 1)
-        self.exit_button = Button(350, 600, exit_img_off, exit_img_on, 1)
+        self.start_button = Button(350, 200, 1, 'Start')
+        self.load_save_button = Button(350, 400, 1, 'Load save')
+        self.exit_button = Button(350, 600, 1, 'Exit')
         self.game_status = GameStatus.in_main_menu
-        self.back_button = Button(350, 200, back_img_off, back_img_on, 1)
-        self.save_game_button = Button(350, 400, save_game_img_off, save_game_img_on, 1)
+        self.back_button = Button(350, 200, 1, 'Back')
+        self.save_game_button = Button(350, 400, 1, 'Save game')
         self.files = os.listdir('saves')
         self.saves = []
         self.need_to_blit = True
@@ -105,7 +105,6 @@ class Game:
             self.finished = True
         if self.load_save_button.collide(self.screen):
             self.game_status = GameStatus.in_saves
-            self.saves[1].clicked = True
             self.load_save_button.clicked = False
 #            print("Введите название сохранения:")
 #            name = input()
@@ -156,7 +155,7 @@ class Game:
         i = 200
         j = 0
         for file in self.files:
-            self.saves.append(Button(350, i, save_img_off, save_img_on, 1))
+            self.saves.append(Button(350, i, 1, file))
             i += 200
             j += 1
 
@@ -167,14 +166,10 @@ class Game:
                 self.finished = True
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 self.game_status = GameStatus.in_main_menu
-            if event.type == pg.MOUSEMOTION:
-                self.saves[1].clicked = False
         self.screen.blit(self.background, (0, 0))
         i = 220
         for k in range(len(self.saves)):
             self.saves[k].draw_on(self.screen)
-            left_pos = 600-f1.render(self.files[k], False, (0, 0, 0)).get_width()/2
-            self.screen.blit(f1.render(self.files[k], False, (0, 0, 0)), (left_pos, i))
             i += 200
             if self.saves[k].collide(self.screen):
                 self.download_game(self.files[k])

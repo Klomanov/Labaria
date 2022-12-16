@@ -6,27 +6,30 @@ from constants import *
 
 class Button(visual.DrawableObject):
     """Класс для кнопок"""
-    def __init__(self, x, y, image_off, image_on, scale):
-        button_width = image_off.get_width()
-        button_height = image_off.get_height()
-        self.image_off = pygame.transform.scale(image_off, (int(button_width * scale), int(button_height * scale)))
-        self.image_on = pygame.transform.scale(image_on, (int(button_width * scale), int(button_height * scale)))
+    def __init__(self, x, y, scale, text):
+        self.button_width = save_img_off.get_width()
+        self.button_height = save_img_on.get_height()
+        self.image_off = pygame.transform.scale(save_img_off, (int(self.button_width * scale), int(self.button_height * scale)))
+        self.image_on = pygame.transform.scale(save_img_on, (int(self.button_width * scale), int(self.button_height * scale)))
         self.rect = self.image_off.get_rect()
         self.rect.topleft = (x, y)
         self.collided = False
         self.clicked = False
+        self.text = text
+        self.f1 = pg.font.Font('DePixel/DePixelBreit.ttf', 60)
 
     def draw_on(self, surface):
         """Рисует кнопку"""
-        f1 = pg.font.Font('DePixel/DePixelSchmal.ttf', 60)
         if self.collided:
             surface.blit(self.image_on, (self.rect.x, self.rect.y))
-#            left_pos = 600-f1.render('Back', False, (0, 0, 0)).get_width()/2
-#            surface.blit(f1.render('Back', False, (0, 0, 0)), (left_pos, 200))
+            left_pos = 600-self.f1.render(self.text, False, (0, 0, 0)).get_width()/2
+            y_pos = self.rect.y + (self.button_height - self.f1.render(self.text, False, (0, 0, 0)).get_height())/2
+            surface.blit(self.f1.render(self.text, False, (0, 0, 0)), (left_pos, y_pos))
         else:
             surface.blit(self.image_off, (self.rect.x, self.rect.y))
-#            left_pos = 600-f1.render('Back', False, (0, 0, 0)).get_width()/2
-#            surface.blit(f1.render('Back', False, (0, 0, 0)), (left_pos, 200))
+            left_pos = 600-self.f1.render(self.text, False, (0, 0, 0)).get_width()/2
+            y_pos = self.rect.y + (self.button_height - self.f1.render(self.text, False, (0, 0, 0)).get_height())/2
+            surface.blit(self.f1.render(self.text, False, (0, 0, 0)), (left_pos, y_pos))
 
     def collide(self, surface):
         action = False
@@ -43,10 +46,11 @@ class Button(visual.DrawableObject):
 
 def button_main():
     """Функция для тестирования"""
+    pg.font.init()
     LABaria = pygame.transform.scale(LABaria_pict, (1200, 800))
-    start_button = Button(350, 200, start_img_off, start_img_on, 1)
-    load_save_button = Button(350, 400, load_save_img_off, load_save_img_on, 1)
-    exit_button = Button(350, 600, exit_img_off, exit_img_on, 1)
+    start_button = Button(350, 200, 1, 'Start')
+    load_save_button = Button(350, 400, 1, 'Load save')
+    exit_button = Button(350, 600, 1, 'Exit')
     screen = pygame.display.set_mode((1200, 800))
     pygame.display.set_caption('Buttons')
     run = True
@@ -60,7 +64,7 @@ def button_main():
         if exit_button.collide(screen):
             run = False
         if load_save_button.collide(screen):
-            print("In progress...")
+            print("Привет")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
