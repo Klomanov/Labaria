@@ -7,10 +7,10 @@ from constants import *
 class Button(visual.DrawableObject):
     """Класс для кнопок"""
     def __init__(self, x, y, scale, text):
-        self.button_width = save_img_off.get_width()
-        self.button_height = save_img_on.get_height()
-        self.image_off = pygame.transform.scale(save_img_off, (int(self.button_width * scale), int(self.button_height * scale)))
-        self.image_on = pygame.transform.scale(save_img_on, (int(self.button_width * scale), int(self.button_height * scale)))
+        self.button_width = button_img_on.get_width()
+        self.button_height = button_img_on.get_height()
+        self.image_off = pygame.transform.scale(button_img_off, (int(self.button_width * scale), int(self.button_height * scale)))
+        self.image_on = pygame.transform.scale(button_img_on, (int(self.button_width * scale), int(self.button_height * scale)))
         self.rect = self.image_off.get_rect()
         self.rect.topleft = (x, y)
         self.collided = False
@@ -60,11 +60,11 @@ def button_main():
         exit_button.draw_on(screen)
         load_save_button.draw_on(screen)
         if start_button.collide(screen):
-            print("Hello")
+            print("Перерыв на обед.")
         if exit_button.collide(screen):
             run = False
         if load_save_button.collide(screen):
-            print("Привет")
+            print()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False

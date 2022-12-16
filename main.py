@@ -10,7 +10,7 @@ from inventory import *
 import time
 import os
 import pickle
-from  world_cutted import *
+from world_cutted import *
 
 
 class Game:
@@ -31,6 +31,7 @@ class Game:
         self.game_status = GameStatus.in_main_menu
         self.back_button = Button(350, 200, 1, 'Back')
         self.save_game_button = Button(350, 400, 1, 'Save game')
+        self.back_to_main_menu_button = Button(350, 600, 1, 'To menu')
         self.files = os.listdir('saves')
         self.saves = []
         self.need_to_blit = True
@@ -97,6 +98,8 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.finished = True
+            if event.type == pg.MOUSEMOTION:
+                self.exit_button.clicked = False
         self.screen.blit(self.background, (0, 0))
         self.start_button.draw_on(self.screen)
         self.exit_button.draw_on(self.screen)
@@ -107,17 +110,9 @@ class Game:
             self.finished = True
         if self.load_save_button.collide(self.screen):
             self.game_status = GameStatus.in_saves
+            if len(self.saves) > 1:
+                self.saves[1].clicked = True
             self.load_save_button.clicked = False
-#            print("Введите название сохранения:")
-#            name = input()
-#            files = os.listdir('saves')
-#            if name in files:
-#                self.download(name)
-#                self.game_status = GameStatus.in_game
-#            else:
-#                print("Сохранение не найдено.")
-#        else:
-#            self.load_save_button.clicked = False
         pygame.display.update()
 
     def pause_activity(self):
@@ -127,7 +122,8 @@ class Game:
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 self.game_status = GameStatus.in_game
         self.back_button.clicked = False
-        if self.need_to_blit == True:
+        self.start_button.clicked = False
+        if self.need_to_blit:
             back1 = self.background
             back1.set_alpha(50)
             self.screen.blit(back1, (0, 0))
@@ -135,9 +131,10 @@ class Game:
         self.back_button.draw_on(self.screen)
         if self.back_button.collide(self.screen):
             self.game_status = GameStatus.in_game
-        self.exit_button.draw_on(self.screen)
-        if self.exit_button.collide(self.screen):
-            self.finished = True
+        self.back_to_main_menu_button.draw_on(self.screen)
+        if self.back_to_main_menu_button.collide(self.screen):
+            self.game_status = GameStatus.in_main_menu
+            self.exit_button.clicked = True
         self.save_game_button.draw_on(self.screen)
         if self.save_game_button.collide(self.screen):
             print("Введите название сохранения:")
@@ -162,12 +159,14 @@ class Game:
             j += 1
 
     def in_saves_activity(self):
-        f1 = pg.font.Font('DePixel/DePixelSchmal.ttf', 60)
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.finished = True
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 self.game_status = GameStatus.in_main_menu
+            if event.type == pg.MOUSEMOTION:
+                if len(self.saves) > 1:
+                    self.saves[1].clicked = False
         self.screen.blit(self.background, (0, 0))
         i = 220
         for k in range(len(self.saves)):
@@ -255,6 +254,7 @@ class Game:
                 self.in_saves_activity()
             if self.game_status == GameStatus.in_game:
                 self.clock.tick(40)
+                self.need_to_blit = True
                 self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
             if self.game_status == GameStatus.in_pause:
