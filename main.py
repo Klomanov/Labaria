@@ -71,6 +71,8 @@ class Game:
             if block.breaking_time is not None:
                 if self.hero.breaking_block == block:
                     if s - self.hero.breaking_start_time >= block_breaking_time[block.type]:
+                        if block.type in block_resource:
+                            self.inventory.increase(block_resource[block.type])
                         self.world.remove_block(chunk, block_x, block_y)
                         self.stop_break_block()
                     else:
@@ -252,7 +254,7 @@ class Game:
             if self.game_status == GameStatus.in_saves:
                 self.in_saves_activity()
             if self.game_status == GameStatus.in_game:
-                self.clock.tick(30)
+                self.clock.tick(40)
                 self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
             if self.game_status == GameStatus.in_pause:
