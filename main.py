@@ -17,11 +17,10 @@ class Game:
         self.finished = False
         self.screen = pg.display.set_mode((screen_width, screen_height))
         self.drawer = visual.Drawer(self.screen)
-        self.world = World(-1)
-        self.hero = Hero(screen_width//2, screen_height//2)
-        self.world.move(-world_size_x//3*block_size, 0)
         self.clock = pg.time.Clock()
-        self.inventory = Inventory(self.screen)
+        self.world = None
+        self.hero = None
+        self.inventory = None
         self.background = pygame.transform.scale(LABaria_pict, (1200, 800))
         self.start_button = Button(350, 200, start_img_off, start_img_on, 1)
         self.load_save_button = Button(350, 400, load_save_off, load_save_on, 1)
@@ -33,10 +32,11 @@ class Game:
     def world_move_general(self, keys):
         """Функция, которая осуществляет движение мира с помощью других функций в world.py"""
         for chunk in range(len(self.world.map)):
-            if self.world.map[chunk][0][0].x >= screen_width + 2*block_size:
-                self.world.move_chunk_to_left(chunk)
-            elif self.world.map[chunk][0][-1].x <= -2*block_size:
-                self.world.move_chunk_to_right(chunk)
+            if visual.is_chunk_on_screen(self.world.map[chunk]):
+                if chunk == chunk_num - 1:
+                    self.world.move_left_chunk_to_right()
+                if chunk == 0:
+                    self.world.move_right_chunk_to_left()
         if keys[pygame.K_a]:
             self.world.vx = hero_speed
         if keys[pygame.K_d]:
@@ -98,6 +98,10 @@ class Game:
         self.load_save_button.draw_on(self.screen)
         if self.start_button.collide(self.screen):
             self.game_status = GameStatus.in_game
+            self.world = World(-1)
+            self.hero = Hero(screen_width//2, screen_height//2)
+            self.world.move(-world_size_x//3*block_size, 0)
+            self.inventory = Inventory(self.screen)
         if self.exit_button.collide(self.screen):
             self.finished = True
         if self.load_save_button.collide(self.screen):
@@ -191,7 +195,7 @@ class Game:
             if self.game_status == GameStatus.in_main_menu:
                 self.main_menu_activity()
             if self.game_status == GameStatus.in_game:
-                self.clock.tick(40)
+                self.clock.tick(60)
                 self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
             if self.game_status == GameStatus.in_pause:
