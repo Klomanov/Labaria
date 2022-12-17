@@ -8,9 +8,9 @@ font_size = 24
 g = 1  # ускорение свободного падения
 
 chunk_num = 4  # Нельзя менять!!!
-chunk_size: int = 30
+chunk_size: int = 150
 world_size_x = chunk_size * chunk_num
-world_size_y = screen_height // block_size + 80  # Высота карты мира
+world_size_y = screen_height // block_size + 100  # Высота карты мира
 sky_level = 30  # s Уровень неба
 bedrock_level = world_size_y - 15  # Уровень коренной породы
 
