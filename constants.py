@@ -211,6 +211,7 @@ class GameStatus:
     in_game = 1
     in_pause = 2
     in_saves = 3
+    in_enter_save = 4
 
 
 class Animations:
@@ -265,3 +266,4 @@ class Animations:
 LABaria_pict = pg.image.load("menu/LABaria.png")
 button_img_off = pg.image.load("menu/button_off.png")
 button_img_on = pg.image.load("menu/button_on.png")
+enter_row_img = pg.image.load("menu/enter_row.png")

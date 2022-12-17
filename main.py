@@ -31,9 +31,11 @@ class Game:
         self.back_button = Button(350, 200, 1, 'Back')
         self.save_game_button = Button(350, 400, 1, 'Save game')
         self.back_to_main_menu_button = Button(350, 600, 1, 'To menu')
+        self.enter_row = pygame.transform.scale(enter_row_img, (700, 100))
         self.files = os.listdir('saves')
         self.saves = []
         self.need_to_blit = True
+        self.text = ''
 
     def world_move_general(self, keys):
         """Функция, которая осуществляет движение мира с помощью других функций в world.py"""
@@ -113,15 +115,9 @@ class Game:
         if self.exit_button.collide(self.screen):
             self.finished = True
         if self.load_save_button.collide(self.screen):
-            print("Введите название сохранения:")
-            name = input()
-            files = os.listdir('saves')
-            if name in files:
-                self.download(name)
-                self.game_status = GameStatus.in_game
-            else:
-                print("Сохранение не найдено.")
-        else:
+            self.game_status = GameStatus.in_saves
+            if len(self.saves) > 1:
+                self.saves[1].clicked = True
             self.load_save_button.clicked = False
         pygame.display.update()
 
@@ -133,11 +129,12 @@ class Game:
                 self.game_status = GameStatus.in_game
         self.back_button.clicked = False
         self.start_button.clicked = False
-        if self.need_to_blit:
-            back1 = self.background
-            back1.set_alpha(50)
-            self.screen.blit(back1, (0, 0))
-            self.need_to_blit = False
+#        if self.need_to_blit:
+#            back1 = self.background
+#            back1.set_alpha(50)
+#            self.screen.blit(back1, (0, 0))
+#            self.need_to_blit = False
+        self.screen.blit(self.background, (0, 0))
         self.back_button.draw_on(self.screen)
         if self.back_button.collide(self.screen):
             self.game_status = GameStatus.in_game
@@ -147,17 +144,46 @@ class Game:
             self.exit_button.clicked = True
         self.save_game_button.draw_on(self.screen)
         if self.save_game_button.collide(self.screen):
-            print("Введите название сохранения:")
-            name = input()
-            if name in self.files:
-                print('Это название уже занято. Используйте другое название.')
-            else:
-                self.save_game(name)
-                print('Файл сохранён.')
-                self.files = os.listdir('saves')
-        else:
-            self.save_game_button.clicked = False
+            self.game_status = GameStatus.in_enter_save
+#            print("Введите название сохранения:")
+#            name = input()
+#            if name in self.files:
+#                print('Это название уже занято. Используйте другое название.')
+#            else:
+#                self.save_game(name)
+#                print('Файл сохранён.')
+#                self.files = os.listdir('saves')
+#        else:
+#            self.save_game_button.clicked = False
         pygame.display.update()
+
+    def enter_save(self, text):
+        font = pg.font.Font('DePixel/DePixelBreit.ttf', 60)
+        f1 = font.render('Enter save name:', False, (0, 0, 0))
+        f2 = font.render('This name is already taken.', False, (0, 0, 0))
+        x_pos = 600 - f1.get_width() / 2
+        y_pos = 400 + (100 - f1.get_height()) / 2
+        self.screen.blit(self.background, (0, 0))
+        self.screen.blit(f1, (x_pos, 250))
+        self.screen.blit(self.enter_row, (250, 400))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.finished = True
+            elif event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                self.game_status = GameStatus.in_pause
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_BACKSPACE and len(text) > 0:
+                    text = text[:-1]
+                elif event.key == pg.K_RETURN:
+                    self.save_game(text)
+                    self.game_status = GameStatus.in_pause
+                    self.text = ''
+                else:
+                    text += event.unicode
+        self.text = text
+        self.screen.blit(font.render(text, False, (0, 0, 0)), (270, y_pos))
+        pygame.display.update()
+
 
     def check_saves(self):
         """Добавляет массив кнопок в соответствии с файлами в 'saves'"""
@@ -231,10 +257,13 @@ class Game:
    #             i = 0
     #            k += 1
             map_converted = pickle.load(file)
+            self.world = World(-1)
             for i in range(len(map_converted)):
                 for j in range(len(map_converted[i])):
                     for k in range(len(map_converted[i][j])):
-                        self.world.map[i][j][k] = Block(map_converted[i][j][k].x, map_converted[i][j][k].y, map_converted[i][j][k].type)
+                        self.world.map[i][j].append(Block(map_converted[i][j][k].x, map_converted[i][j][k].y, map_converted[i][j][k].type))
+            self.hero = Hero(screen_width // 2, screen_height // 2)
+            self.inventory = Inventory(self.screen)
         finally:
             file.close()
 
@@ -269,6 +298,8 @@ class Game:
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
             if self.game_status == GameStatus.in_pause:
                 self.pause_activity()
+            if self.game_status == GameStatus.in_enter_save:
+                self.enter_save(self.text)
 
 
 if __name__ == "__main__":
