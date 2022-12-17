@@ -180,6 +180,10 @@ class ResourceType:
     dirt = 1
     stone = 2
     wood = 3
+    mushroom_red = 4
+    mushroom_brown = 5
+    rock = 6
+    rock_moss = 7
 
 
 block_resource = {BlockType.grass: ResourceType.dirt,
@@ -198,12 +202,38 @@ block_resource = {BlockType.grass: ResourceType.dirt,
                   BlockType.leaves_middle_top: BlockType.sky,
                   BlockType.leaves_right_top: BlockType.sky}
 
-resource = [ResourceType.grass, ResourceType.dirt, ResourceType.stone, ResourceType.wood]
+resource = [ResourceType.grass, ResourceType.dirt,
+            ResourceType.stone, ResourceType.wood,
+            ResourceType.mushroom_red, ResourceType.mushroom_brown,
+            ResourceType.rock, ResourceType.rock_moss]
 
 resource_images = {ResourceType.grass: pg.image.load("textures/grass_inventory.png"),
                    ResourceType.dirt: pg.image.load("textures/dirt_inventory.png"),
                    ResourceType.stone: pg.image.load("textures/stone_inventory.png"),
-                   ResourceType.wood: pg.image.load("textures/wood_inventory.png")}
+                   ResourceType.wood: pg.image.load("textures/wood_inventory1.png"),
+                   ResourceType.mushroom_red: pg.image.load("textures/decorations/tile_mushroom_red.png"),
+                   ResourceType.mushroom_brown: pg.image.load("textures/decorations/tile_mushroom_brown.png"),
+                   ResourceType.rock: pg.image.load("textures/decorations/tile_rock.png"),
+                   ResourceType.rock_moss: pg.image.load("textures/decorations/tile_rock_moss.png")}
+
+
+resource_keys = {ResourceType.grass: pg.K_0,
+                 ResourceType.dirt: pg.K_1,
+                 ResourceType.stone: pg.K_2,
+                 ResourceType.wood: pg.K_3,
+                 ResourceType.mushroom_red: pg.K_4,
+                 ResourceType.mushroom_brown: pg.K_5,
+                 ResourceType.rock: pg.K_6,
+                 ResourceType.rock_moss: pg.K_7}
+
+resource_surnames = {ResourceType.grass: "GRASS",
+                     ResourceType.dirt: "DIRT",
+                     ResourceType.stone: "STONE",
+                     ResourceType.wood: "WOOD",
+                     ResourceType.mushroom_red: "RED MUSHROOM",
+                     ResourceType.mushroom_brown: "BROWN MUSHROOM",
+                     ResourceType.rock: "ROCK",
+                     ResourceType.rock_moss: "ROCK_MOSS"}
 
 
 class GameStatus:
@@ -212,6 +242,9 @@ class GameStatus:
     in_pause = 2
     in_saves = 3
     in_enter_save = 4
+
+
+plus = pg.image.load("menu/plus.png")
 
 
 class Animations:
