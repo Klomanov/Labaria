@@ -108,7 +108,7 @@ class Game:
         self.load_save_button.draw_on(self.screen)
         if self.start_button.collide(self.screen):
             self.game_status = GameStatus.in_game
-            self.world = World(-1)
+            self.world = World(seed=-1)
             self.hero = Hero(screen_width//2, screen_height//2)
             self.world.move(-world_size_x//3*block_size, 0)
             self.inventory = Inventory(self.screen)
@@ -184,9 +184,9 @@ class Game:
         self.screen.blit(font.render(text, False, (0, 0, 0)), (270, y_pos))
         pygame.display.update()
 
-
     def check_saves(self):
         """Добавляет массив кнопок в соответствии с файлами в 'saves'"""
+        self.saves = []
         i = 200
         j = 0
         for file in self.files:
@@ -203,6 +203,8 @@ class Game:
             if event.type == pg.MOUSEMOTION:
                 if len(self.saves) > 1:
                     self.saves[1].clicked = False
+        self.save_game_button.clicked = False
+        self.back_to_main_menu_button.clicked = False
         self.screen.blit(self.background, (0, 0))
         i = 220
         for k in range(len(self.saves)):
@@ -223,6 +225,7 @@ class Game:
 #                        file.write(f'{block.x}_{block.y}_{block.type} ')
 #                    file.write('$')
 #                file.write('%')
+#            pickled_file = []
             pickled_map = []
             for i in range(len(self.world.map)):
                 pickled_map.append([])
@@ -231,17 +234,23 @@ class Game:
                     for k in range(len(self.world.map[i][j])):
                         pickled_block = PickledBlock(self.world.map[i][j][k].x, self.world.map[i][j][k].y, self.world.map[i][j][k].type)
                         pickled_map[i][j].append(pickled_block)
+#            pickled_file.append(pickled_map)
+#            pickled_file.append(self.inventory.whole_inventory)
             pickle.dump(pickled_map, file)
         finally:
             file.close()
 
     def download_game(self, name):
         """Скачивает мир из файла"""
-#        i = 0
+        self.world = World(file_name=name)
+        self.inventory = Inventory(self.screen)
+        self.hero = Hero(screen_width // 2, screen_height // 2)
+
+    #        i = 0
 #        j = 0
 #        k = 0
-        file = open(f'saves/{name}', 'rb')
-        try:
+#        file = open(f'saves/{name}', 'rb')
+    #    try:
 #            text = file.read()
 #            text = text.split('%')
 #            for chunks in text:
@@ -256,16 +265,18 @@ class Game:
   #                  i += 1
    #             i = 0
     #            k += 1
-            map_converted = pickle.load(file)
-            self.world = World(-1)
-            for i in range(len(map_converted)):
-                for j in range(len(map_converted[i])):
-                    for k in range(len(map_converted[i][j])):
-                        self.world.map[i][j].append(Block(map_converted[i][j][k].x, map_converted[i][j][k].y, map_converted[i][j][k].type))
-            self.hero = Hero(screen_width // 2, screen_height // 2)
-            self.inventory = Inventory(self.screen)
-        finally:
-            file.close()
+    #        file_converted = pickle.load(file)
+    #        self.world = World(-1)
+    #        for i in range(len(file_converted)):
+    #            for j in range(len(file_converted[i])):
+    #                for k in range(len(file_converted[i][j])):
+    #                    self.world.map[i][j].append(Block(file_converted[i][j][k].x, file_converted[i][j][k].y, file_converted[i][j][k].type))
+    #        self.hero = Hero(screen_width // 2, screen_height // 2)
+    #        self.inventory = Inventory(self.screen)
+    #        self.inventory.whole_inventory = file_converted[1]
+
+     #   finally:
+     #       file.close()
 
     def event_handler(self, events):
         for event in events:
@@ -297,6 +308,8 @@ class Game:
                 self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
             if self.game_status == GameStatus.in_pause:
+                self.files = os.listdir('saves')
+                self.check_saves()
                 self.pause_activity()
             if self.game_status == GameStatus.in_enter_save:
                 self.enter_save(self.text)
