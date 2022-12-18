@@ -9,6 +9,8 @@ from buttons import *
 from inventory import *
 import time
 import os
+import pickle
+from world_cutted import *
 
 
 class Game:
@@ -22,12 +24,18 @@ class Game:
         self.hero = None
         self.inventory = None
         self.background = pygame.transform.scale(LABaria_pict, (1200, 800))
-        self.start_button = Button(350, 200, start_img_off, start_img_on, 1)
-        self.load_save_button = Button(350, 400, load_save_off, load_save_on, 1)
-        self.exit_button = Button(350, 600, exit_img_off, exit_img_on, 1)
+        self.start_button = Button(350, 200, 1, 'Start')
+        self.load_save_button = Button(350, 400, 1, 'Load save')
+        self.exit_button = Button(350, 600, 1, 'Exit')
         self.game_status = GameStatus.in_main_menu
-        self.back_button = Button(350, 200, back_img_off, back_img_on, 1)
-        self.save_game_button = Button(350, 400, save_game_img_off, save_game_img_on, 1)
+        self.back_button = Button(350, 200, 1, 'Back')
+        self.save_game_button = Button(350, 400, 1, 'Save game')
+        self.back_to_main_menu_button = Button(350, 600, 1, 'To menu')
+        self.enter_row = pygame.transform.scale(enter_row_img, (700, 100))
+        self.files = os.listdir('saves')
+        self.saves = []
+        self.need_to_blit = True
+        self.text = ''
 
     def world_move_general(self, keys):
         """Функция, которая осуществляет движение мира с помощью других функций в world.py"""
@@ -92,28 +100,25 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.finished = True
+            if event.type == pg.MOUSEMOTION:
+                self.exit_button.clicked = False
+        self.back_to_main_menu_button.clicked = False
         self.screen.blit(self.background, (0, 0))
         self.start_button.draw_on(self.screen)
         self.exit_button.draw_on(self.screen)
         self.load_save_button.draw_on(self.screen)
         if self.start_button.collide(self.screen):
             self.game_status = GameStatus.in_game
-            self.world = World(-1)
+            self.world = World(seed=-1)
             self.hero = Hero(screen_width//2, screen_height//2)
             self.world.move(-world_size_x//3*block_size, 0)
             self.inventory = Inventory(self.screen)
         if self.exit_button.collide(self.screen):
             self.finished = True
         if self.load_save_button.collide(self.screen):
-            print("Введите название сохранения:")
-            name = input()
-            files = os.listdir('saves')
-            if name in files:
-                self.download(name)
-                self.game_status = GameStatus.in_game
-            else:
-                print("Сохранение не найдено.")
-        else:
+            self.game_status = GameStatus.in_saves
+            if len(self.saves) > 1:
+                self.saves[1].clicked = True
             self.load_save_button.clicked = False
         pygame.display.update()
 
@@ -124,55 +129,113 @@ class Game:
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 self.game_status = GameStatus.in_game
         self.back_button.clicked = False
-        self.save_game_button.clicked = False
-        self.screen.blit(self.background, (0, 0))
+        self.start_button.clicked = False
+        if self.need_to_blit:
+            back1 = self.background
+            back1.set_alpha(50)
+            self.screen.blit(back1, (0, 0))
+            self.need_to_blit = False
         self.back_button.draw_on(self.screen)
         if self.back_button.collide(self.screen):
             self.game_status = GameStatus.in_game
-        self.exit_button.draw_on(self.screen)
-        if self.exit_button.collide(self.screen):
-            self.finished = True
+        self.back_to_main_menu_button.draw_on(self.screen)
+        if self.back_to_main_menu_button.collide(self.screen):
+            self.game_status = GameStatus.in_main_menu
+            self.exit_button.clicked = True
         self.save_game_button.draw_on(self.screen)
         if self.save_game_button.collide(self.screen):
-            print("Введите название сохранения:")
-            name = input()
-            files = os.listdir('saves')
-            if name in files:
-                print('Это название уже занято. Используйте другое название.')
-            else:
-                self.save(name)
-                print('Файл сохранён.')
+            self.need_to_blit = True
+            self.drawer.update_screen(self.world.map, self.hero, self.inventory)
+            self.game_status = GameStatus.in_enter_save
+
         pygame.display.update()
 
-    def save(self, name):
+    def enter_save(self, text):
+        self.save_game_button.clicked = False
+        font = pg.font.Font('DePixel/DePixelBreit.ttf', 60)
+        f1 = font.render('Enter save name:', False, (0, 0, 0))
+        f2 = font.render('This name is already taken.', False, (0, 0, 0))
+        x_pos = 600 - f1.get_width() / 2
+        y_pos = 400 + (100 - f1.get_height()) / 2
+        if self.need_to_blit:
+            back1 = self.background
+            back1.set_alpha(50)
+            self.screen.blit(back1, (0, 0))
+            self.need_to_blit = False
+        self.screen.blit(f1, (x_pos, 250))
+        self.screen.blit(self.enter_row, (250, 400))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.finished = True
+            elif event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                self.game_status = GameStatus.in_pause
+                self.drawer.update_screen(self.world.map, self.hero, self.inventory)
+                self.need_to_blit = True
+                text = ''
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_BACKSPACE and len(text) > 0:
+                    text = text[:-1]
+                elif event.key == pg.K_RETURN:
+                    self.save_game(text)
+                    self.game_status = GameStatus.in_pause
+                    self.drawer.update_screen(self.world.map, self.hero, self.inventory)
+                    self.need_to_blit = True
+                    text = ''
+                else:
+                    text += event.unicode
+        self.text = text
+        self.screen.blit(font.render(self.text, False, (0, 0, 0)), (270, y_pos))
+        pygame.display.update()
+
+    def check_saves(self):
+        """Добавляет массив кнопок в соответствии с файлами в 'saves'"""
+        self.saves = []
+        i = 200
+        j = 0
+        for file in self.files:
+            self.saves.append(Button(350, i, 1, file))
+            i += 200
+            j += 1
+
+    def in_saves_activity(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.finished = True
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                self.game_status = GameStatus.in_main_menu
+            if event.type == pg.MOUSEMOTION:
+                if len(self.saves) > 1:
+                    self.saves[1].clicked = False
+        self.save_game_button.clicked = False
+        self.back_to_main_menu_button.clicked = False
+        self.screen.blit(self.background, (0, 0))
+        i = 220
+        for k in range(len(self.saves)):
+            self.saves[k].draw_on(self.screen)
+            i += 200
+            if self.saves[k].collide(self.screen):
+                self.download_game(self.files[k])
+                self.game_status = GameStatus.in_game
+        pygame.display.update()
+
+    def save_game(self, name):
         """Сохраняет мир в файл"""
-        file = open(f'saves/{name}', 'a')
+        file = open(f'saves/{name}', 'wb')
         try:
-            for rows in self.world.map:
-                for block in rows:
-                    file.write(f'{block.x}_{block.y}_{block.type} ')
-                file.write('$')
+            pickled_file = []
+            pickled_map = PickledWorld(self.world.map)
+            pickled_file.append(pickled_map)
+            pickled_inventory = PickledInventory(self.inventory.resources)
+            pickled_file.append(pickled_inventory.resources)
+            pickle.dump(pickled_file, file)
         finally:
             file.close()
 
-    def download(self, name):
+    def download_game(self, name):
         """Скачивает мир из файла"""
-        i = 0
-        j = 0
-        file = open(f'saves/{name}', 'r')
-        try:
-            text = file.read()
-            text = text.split('$')
-            for string in text:
-                string = string.split()
-                for ministring in string:
-                    ministring = ministring.split('_')
-                    self.world.map[i][j] = Block(float(ministring[0]), float(ministring[1]), int(float(ministring[2])))
-                    j += 1
-                j = 0
-                i += 1
-        finally:
-            file.close()
+        self.world = World(file_name=name)
+        self.inventory = Inventory(self.screen, name)
+        self.hero = Hero(screen_width // 2, screen_height // 2)
 
     def event_handler(self, events):
         for event in events:
@@ -191,15 +254,24 @@ class Game:
         self.hero.set_animation(self.world.vx)
 
     def run(self):
+        pg.font.init()
+        self.check_saves()
         while not self.finished:
             if self.game_status == GameStatus.in_main_menu:
                 self.main_menu_activity()
+            if self.game_status == GameStatus.in_saves:
+                self.in_saves_activity()
             if self.game_status == GameStatus.in_game:
                 self.clock.tick(60)
+                self.need_to_blit = True
                 self.event_handler(pygame.event.get())
                 self.drawer.update_screen(self.world.map, self.hero, self.inventory)
             if self.game_status == GameStatus.in_pause:
+                self.files = os.listdir('saves')
+                self.check_saves()
                 self.pause_activity()
+            if self.game_status == GameStatus.in_enter_save:
+                self.enter_save(self.text)
 
 
 if __name__ == "__main__":

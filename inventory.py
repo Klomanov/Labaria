@@ -1,17 +1,28 @@
 import pygame as pg
 import pygame.mouse
-
+import pickle
 import visual
 from constants import *
 
 
 class Inventory(visual.DrawableObject):
 
-    def __init__(self, screen):
+    def __init__(self, screen, name=None):
         self.screen = screen
         self.resources = {}
+        if name is not None:
+           self.load_resources(name)
         self.panel = 4
         self.flag = False
+
+    def load_resources(self, name):
+        file = open(f'saves/{name}', 'rb')
+        resources = pickle.load(file)[1]
+        for name, resource in resources.items():
+            self.resources[name] = [name, resource_images[name], resource_keys[name], resource[1],
+                                    resource_surnames[name]]
+        file.close()
+
 
     def add_resource(self, name):
         surname = resource_surnames[name]

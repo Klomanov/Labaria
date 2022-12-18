@@ -7,14 +7,33 @@ from block import Block
 import random
 from matplotlib import pyplot as plt
 import time
+import pickle
 
 
 class World:
-    def __init__(self, seed):
-        self.seed = seed
+    def __init__(self, seed=None, file_name=None):
         self.map = []
         self.vx = 0
         self.vy = 0
+        self.seed = seed
+        if seed is None:
+            self.load_world(file_name)
+        else:
+            self.create_new_world()
+
+    def load_world(self, name: str):
+        file = open(f'saves/{name}', 'rb')
+        map_converted = pickle.load(file)[0].pickled_map
+        for i in range(len(map_converted)):
+            self.map.append([])
+            for j in range(len(map_converted[i])):
+                self.map[i].append([])
+                for k in range(len(map_converted[i][j])):
+                    self.map[i][j].append(
+                        Block(map_converted[i][j][k].x, map_converted[i][j][k].y, map_converted[i][j][k].type))
+        file.close()
+
+    def create_new_world(self):
         self.__init_sky()
         self.__init_landscape()
         self.__init_stone()

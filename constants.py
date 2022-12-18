@@ -244,6 +244,8 @@ class GameStatus:
     in_main_menu = 0
     in_game = 1
     in_pause = 2
+    in_saves = 3
+    in_enter_save = 4
 
 
 plus = pg.image.load("menu/plus.png")
@@ -298,14 +300,7 @@ class Animations:
         pg.transform.scale(pg.image.load("animation/character_male_down_kick6.png"), (hero_width, hero_height))]
 
 
-start_img_off = pg.image.load("menu/button_start_off.png")
-start_img_on = pg.image.load("menu/button_start_on.png")
-exit_img_on = pg.image.load("menu/button_exit_on.png")
-exit_img_off = pg.image.load("menu/button_exit_off.png")
-load_save_on = pg.image.load("menu/button_load_save_on.png")
-load_save_off = pg.image.load("menu/button_load_save_off.png")
 LABaria_pict = pg.image.load("menu/LABaria.png")
-back_img_off = pg.image.load("menu/button_back_off.png")
-back_img_on = pg.image.load("menu/button_back_on.png")
-save_game_img_off = pg.image.load("menu/button_save_game_off.png")
-save_game_img_on = pg.image.load("menu/button_save_game_on.png")
+button_img_off = pg.image.load("menu/button_off.png")
+button_img_on = pg.image.load("menu/button_on.png")
+enter_row_img = pg.image.load("menu/enter_row.png")
