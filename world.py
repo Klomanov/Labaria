@@ -23,7 +23,7 @@ class World:
 
     def load_world(self, name: str):
         file = open(f'saves/{name}', 'rb')
-        map_converted = pickle.load(file)
+        map_converted = pickle.load(file)[0].pickled_map
         for i in range(len(map_converted)):
             self.map.append([])
             for j in range(len(map_converted[i])):

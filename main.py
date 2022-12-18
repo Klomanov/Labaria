@@ -102,6 +102,7 @@ class Game:
                 self.finished = True
             if event.type == pg.MOUSEMOTION:
                 self.exit_button.clicked = False
+        self.back_to_main_menu_button.clicked = False
         self.screen.blit(self.background, (0, 0))
         self.start_button.draw_on(self.screen)
         self.exit_button.draw_on(self.screen)
@@ -129,12 +130,11 @@ class Game:
                 self.game_status = GameStatus.in_game
         self.back_button.clicked = False
         self.start_button.clicked = False
-#        if self.need_to_blit:
-#            back1 = self.background
-#            back1.set_alpha(50)
-#            self.screen.blit(back1, (0, 0))
-#            self.need_to_blit = False
-        self.screen.blit(self.background, (0, 0))
+        if self.need_to_blit:
+            back1 = self.background
+            back1.set_alpha(50)
+            self.screen.blit(back1, (0, 0))
+            self.need_to_blit = False
         self.back_button.draw_on(self.screen)
         if self.back_button.collide(self.screen):
             self.game_status = GameStatus.in_game
@@ -144,26 +144,24 @@ class Game:
             self.exit_button.clicked = True
         self.save_game_button.draw_on(self.screen)
         if self.save_game_button.collide(self.screen):
+            self.need_to_blit = True
+            self.drawer.update_screen(self.world.map, self.hero, self.inventory)
             self.game_status = GameStatus.in_enter_save
-#            print("Введите название сохранения:")
-#            name = input()
-#            if name in self.files:
-#                print('Это название уже занято. Используйте другое название.')
-#            else:
-#                self.save_game(name)
-#                print('Файл сохранён.')
-#                self.files = os.listdir('saves')
-#        else:
-#            self.save_game_button.clicked = False
+
         pygame.display.update()
 
     def enter_save(self, text):
+        self.save_game_button.clicked = False
         font = pg.font.Font('DePixel/DePixelBreit.ttf', 60)
         f1 = font.render('Enter save name:', False, (0, 0, 0))
         f2 = font.render('This name is already taken.', False, (0, 0, 0))
         x_pos = 600 - f1.get_width() / 2
         y_pos = 400 + (100 - f1.get_height()) / 2
-        self.screen.blit(self.background, (0, 0))
+        if self.need_to_blit:
+            back1 = self.background
+            back1.set_alpha(50)
+            self.screen.blit(back1, (0, 0))
+            self.need_to_blit = False
         self.screen.blit(f1, (x_pos, 250))
         self.screen.blit(self.enter_row, (250, 400))
         for event in pygame.event.get():
@@ -171,17 +169,22 @@ class Game:
                 self.finished = True
             elif event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 self.game_status = GameStatus.in_pause
+                self.drawer.update_screen(self.world.map, self.hero, self.inventory)
+                self.need_to_blit = True
+                text = ''
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_BACKSPACE and len(text) > 0:
                     text = text[:-1]
                 elif event.key == pg.K_RETURN:
                     self.save_game(text)
                     self.game_status = GameStatus.in_pause
-                    self.text = ''
+                    self.drawer.update_screen(self.world.map, self.hero, self.inventory)
+                    self.need_to_blit = True
+                    text = ''
                 else:
                     text += event.unicode
         self.text = text
-        self.screen.blit(font.render(text, False, (0, 0, 0)), (270, y_pos))
+        self.screen.blit(font.render(self.text, False, (0, 0, 0)), (270, y_pos))
         pygame.display.update()
 
     def check_saves(self):
@@ -219,64 +222,20 @@ class Game:
         """Сохраняет мир в файл"""
         file = open(f'saves/{name}', 'wb')
         try:
-#            for chunks in self.world.map:
-#                for rows in chunks:
-#                    for block in rows:
-#                        file.write(f'{block.x}_{block.y}_{block.type} ')
-#                    file.write('$')
-#                file.write('%')
-#            pickled_file = []
-            pickled_map = []
-            for i in range(len(self.world.map)):
-                pickled_map.append([])
-                for j in range(len(self.world.map[i])):
-                    pickled_map[i].append([])
-                    for k in range(len(self.world.map[i][j])):
-                        pickled_block = PickledBlock(self.world.map[i][j][k].x, self.world.map[i][j][k].y, self.world.map[i][j][k].type)
-                        pickled_map[i][j].append(pickled_block)
-#            pickled_file.append(pickled_map)
-#            pickled_file.append(self.inventory.whole_inventory)
-            pickle.dump(pickled_map, file)
+            pickled_file = []
+            pickled_map = PickledWorld(self.world.map)
+            pickled_file.append(pickled_map)
+            pickled_inventory = PickledInventory(self.inventory.resources)
+            pickled_file.append(pickled_inventory.resources)
+            pickle.dump(pickled_file, file)
         finally:
             file.close()
 
     def download_game(self, name):
         """Скачивает мир из файла"""
         self.world = World(file_name=name)
-        self.inventory = Inventory(self.screen)
+        self.inventory = Inventory(self.screen, name)
         self.hero = Hero(screen_width // 2, screen_height // 2)
-
-    #        i = 0
-#        j = 0
-#        k = 0
-#        file = open(f'saves/{name}', 'rb')
-    #    try:
-#            text = file.read()
-#            text = text.split('%')
-#            for chunks in text:
-#                chunks = chunks.split('$')
-#                for string in chunks:
-#                    string = string.split()
-#                    for ministring in string:
-#                       ministring = ministring.split('_')
- #                       self.world.map[k][i][j] = Block(float(ministring[0]), float(ministring[1]), int(float(ministring[2])))
- #                       j += 1
- #                   j = 0
-  #                  i += 1
-   #             i = 0
-    #            k += 1
-    #        file_converted = pickle.load(file)
-    #        self.world = World(-1)
-    #        for i in range(len(file_converted)):
-    #            for j in range(len(file_converted[i])):
-    #                for k in range(len(file_converted[i][j])):
-    #                    self.world.map[i][j].append(Block(file_converted[i][j][k].x, file_converted[i][j][k].y, file_converted[i][j][k].type))
-    #        self.hero = Hero(screen_width // 2, screen_height // 2)
-    #        self.inventory = Inventory(self.screen)
-    #        self.inventory.whole_inventory = file_converted[1]
-
-     #   finally:
-     #       file.close()
 
     def event_handler(self, events):
         for event in events:
