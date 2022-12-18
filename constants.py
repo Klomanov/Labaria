@@ -8,9 +8,9 @@ font_size = 24
 g = 1  # ускорение свободного падения
 
 chunk_num = 4  # Нельзя менять!!!
-chunk_size: int = 150
+chunk_size: int = 120
 world_size_x = chunk_size * chunk_num
-world_size_y = screen_height // block_size + 100  # Высота карты мира
+world_size_y = screen_height // block_size + 80  # Высота карты мира
 sky_level = 30  # s Уровень неба
 bedrock_level = world_size_y - 15  # Уровень коренной породы
 
@@ -57,11 +57,13 @@ class BlockType:
     dec_mushroom_red = 24
     dec_rock = 25
     dec_rock_moss = 26
+    log = 27
 
 
 block_images = {BlockType.grass: pg.image.load("textures/tile_grass.jpg"),
                 BlockType.dirt: pg.image.load("textures/tile_dirt.png"),
                 BlockType.sky: pg.image.load("textures/tile_sky.png"),
+                BlockType.log: pg.image.load("textures/wood_inventory.png"),
                 BlockType.bg_dirt: pg.image.load("textures/tile_bg_dirt.png"),
                 BlockType.stone: pg.image.load("textures/tile_stone.png"),
                 BlockType.bg_stone: pg.image.load("textures/tile_bg_stone.png"),
@@ -85,7 +87,7 @@ block_images = {BlockType.grass: pg.image.load("textures/tile_grass.jpg"),
                 BlockType.dec_mushroom_brown: pg.image.load("textures/decorations/tile_mushroom_brown.png"),
                 BlockType.dec_mushroom_red: pg.image.load("textures/decorations/tile_mushroom_red.png"),
                 BlockType.dec_rock: pg.image.load("textures/decorations/tile_rock.png"),
-                BlockType.dec_rock_moss: pg.image.load("textures/decorations/tile_rock_moss.png"),}
+                BlockType.dec_rock_moss: pg.image.load("textures/decorations/tile_rock_moss.png"), }
 
 block_breaking_time = {BlockType.grass: 0.5,  # Время в секундах на ломание блока
                        BlockType.dirt: 0.5,
@@ -114,6 +116,7 @@ block_breaking_time = {BlockType.grass: 0.5,  # Время в секундах �
                        BlockType.dec_mushroom_red: 0.2,
                        BlockType.dec_rock: 0.2,
                        BlockType.dec_rock_moss: 0.2,
+                       BlockType.log: 0.75,
                        }
 
 block_collisions = {BlockType.grass: True,
@@ -143,6 +146,7 @@ block_collisions = {BlockType.grass: True,
                     BlockType.dec_mushroom_red: False,
                     BlockType.dec_rock: False,
                     BlockType.dec_rock_moss: False,
+                    BlockType.log: True
                     }
 
 block_bg = {BlockType.grass: BlockType.bg_dirt,
@@ -172,6 +176,7 @@ block_bg = {BlockType.grass: BlockType.bg_dirt,
             BlockType.dec_mushroom_red: BlockType.sky,
             BlockType.dec_rock: BlockType.bg_stone,
             BlockType.dec_rock_moss: BlockType.bg_stone,
+            BlockType.log: BlockType.sky,
             }
 
 
@@ -179,43 +184,40 @@ class ResourceType:
     grass = 0
     dirt = 1
     stone = 2
-    wood = 3
     mushroom_red = 4
     mushroom_brown = 5
     rock = 6
     rock_moss = 7
+    log = 8
 
 
+# Это массив соответствия ресурса, который выпадает, когда ломаешь блока
 block_resource = {BlockType.grass: ResourceType.dirt,
                   BlockType.dirt: ResourceType.dirt,
                   BlockType.stone: ResourceType.stone,
-                  BlockType.tree_bottom: ResourceType.wood,
-                  BlockType.tree_middle: ResourceType.wood,
-                  BlockType.tree_top: ResourceType.wood,
-                  BlockType.leaves_left_bottom: BlockType.sky,
-                  BlockType.leaves_middle_bottom: BlockType.sky,
-                  BlockType.leaves_right_bottom: BlockType.sky,
-                  BlockType.leaves_left_middle: BlockType.sky,
-                  BlockType.leaves_middle_middle: BlockType.sky,
-                  BlockType.leaves_right_middle: BlockType.sky,
-                  BlockType.leaves_left_top: BlockType.sky,
-                  BlockType.leaves_middle_top: BlockType.sky,
-                  BlockType.leaves_right_top: BlockType.sky}
+                  BlockType.tree_bottom: ResourceType.log,
+                  BlockType.tree_middle: ResourceType.log,
+                  BlockType.tree_top: ResourceType.log,
+                  BlockType.log: ResourceType.log}
+
+# Это массив соответствия блоку, когда ставишь ресурс
+resource_block = {ResourceType.dirt: BlockType.dirt,
+                  ResourceType.stone: BlockType.stone,
+                  ResourceType.log: BlockType.log}
 
 resource = [ResourceType.grass, ResourceType.dirt,
-            ResourceType.stone, ResourceType.wood,
+            ResourceType.stone, ResourceType.log,
             ResourceType.mushroom_red, ResourceType.mushroom_brown,
             ResourceType.rock, ResourceType.rock_moss]
 
 resource_images = {ResourceType.grass: pg.image.load("textures/grass_inventory.png"),
                    ResourceType.dirt: pg.image.load("textures/dirt_inventory.png"),
                    ResourceType.stone: pg.image.load("textures/stone_inventory.png"),
-                   ResourceType.wood: pg.image.load("textures/wood_inventory1.png"),
+                   ResourceType.log: pg.image.load("textures/wood_inventory1.png"),
                    ResourceType.mushroom_red: pg.image.load("textures/decorations/tile_mushroom_red.png"),
                    ResourceType.mushroom_brown: pg.image.load("textures/decorations/tile_mushroom_brown.png"),
                    ResourceType.rock: pg.image.load("textures/decorations/tile_rock.png"),
                    ResourceType.rock_moss: pg.image.load("textures/decorations/tile_rock_moss.png")}
-
 
 keys = [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6, pg.K_7]
 
@@ -224,7 +226,7 @@ cross = pg.image.load("menu/cross.png")
 resource_keys = {ResourceType.grass: pg.K_0,
                  ResourceType.dirt: pg.K_1,
                  ResourceType.stone: pg.K_2,
-                 ResourceType.wood: pg.K_3,
+                 ResourceType.log: pg.K_3,
                  ResourceType.mushroom_red: pg.K_4,
                  ResourceType.mushroom_brown: pg.K_5,
                  ResourceType.rock: pg.K_6,
@@ -233,11 +235,11 @@ resource_keys = {ResourceType.grass: pg.K_0,
 resource_surnames = {ResourceType.grass: "GRASS",
                      ResourceType.dirt: "DIRT",
                      ResourceType.stone: "STONE",
-                     ResourceType.wood: "WOOD",
+                     ResourceType.log: "LOG",
                      ResourceType.mushroom_red: "RED MUSHROOM",
                      ResourceType.mushroom_brown: "BROWN MUSHROOM",
                      ResourceType.rock: "ROCK",
-                     ResourceType.rock_moss: "ROCK_MOSS"}
+                     ResourceType.rock_moss: "ROCK MOSS"}
 
 
 class GameStatus:

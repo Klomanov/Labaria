@@ -76,6 +76,7 @@ class Game:
                     if s - self.hero.breaking_start_time >= block_breaking_time[block.type]:
                         if block.type in block_resource:
                             self.inventory.increase(block_resource[block.type])
+                            self.hero.selected_item_type = block_resource[block.type]
                         self.world.remove_block(chunk, block_x, block_y)
                         self.stop_break_block()
                     else:
@@ -96,11 +97,21 @@ class Game:
             self.hero.breaking_block = None
             self.hero.breaking_start_time = None
 
+    def build_block(self, chunk, x, y):
+        block = self.world.map[chunk][y][x]
+        if block.type == BlockType.sky or block.type == BlockType.bg_stone or block.type == BlockType.bg_dirt:
+            if (block.x >= self.hero.x + 0.75*hero_width or self.hero.x - 0.75*hero_width >= block.x)\
+                    or (block.y >= self.hero.y + 0.75*hero_height or self.hero.y - 0.75*hero_height >= block.y):
+                if self.hero.selected_item_type is not None and self.hero.selected_item_type in self.inventory.resources:
+                    if (block.x - self.hero.x) ** 2 + (block.y - self.hero.y) ** 2 <= hero_dig_range ** 2:
+                        self.world.place_block(chunk, x, y, resource_block[self.hero.selected_item_type])
+                        self.inventory.decrease(self.hero.selected_item_type)
+
     def main_menu_activity(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.finished = True
-            if event.type == pg.MOUSEMOTION:
+            if event.type == pg.MOUSEMOTION and self.exit_button.clicked:
                 self.exit_button.clicked = False
         self.back_to_main_menu_button.clicked = False
         self.screen.blit(self.background, (0, 0))
@@ -243,13 +254,22 @@ class Game:
                 self.finished = True
             if event.type == pg.MOUSEBUTTONUP and event.button == pg.BUTTON_LEFT:
                 self.stop_break_block()
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == pg.BUTTON_RIGHT:
+                chunk, place_x, place_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
+                if chunk is not None:
+                    self.build_block(chunk, place_x, place_y)
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.game_status = GameStatus.in_pause
 
+        for i in range(len(keys)):
+            if pg.key.get_pressed()[keys[i]]:
+                self.hero.selected_item_type = self.inventory.resources[list(self.inventory.resources.keys())[i]][0]
+
         if self.game_status == GameStatus.in_game and pg.mouse.get_pressed()[0]:
             chunk, destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
-            self.break_block(chunk, destroy_x, destroy_y)
+            if chunk is not None:
+                self.break_block(chunk, destroy_x, destroy_y)
         self.world_move_general(pg.key.get_pressed())
         self.hero.set_animation(self.world.vx)
 

@@ -14,6 +14,7 @@ class Hero(visual.DrawableObject):
         self.rect = self.image.get_rect(center=(self.x, self.y))
         self.breaking_block = None
         self.breaking_start_time = None
+        self.selected_item_type = None
 
     def set_animation(self, vx):
         if self.breaking_block is not None:
