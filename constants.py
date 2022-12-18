@@ -217,6 +217,10 @@ resource_images = {ResourceType.grass: pg.image.load("textures/grass_inventory.p
                    ResourceType.rock_moss: pg.image.load("textures/decorations/tile_rock_moss.png")}
 
 
+keys = [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6, pg.K_7]
+
+cross = pg.image.load("menu/cross.png")
+
 resource_keys = {ResourceType.grass: pg.K_0,
                  ResourceType.dirt: pg.K_1,
                  ResourceType.stone: pg.K_2,

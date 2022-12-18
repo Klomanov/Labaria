@@ -53,7 +53,7 @@ class Inventory(visual.DrawableObject):
 
         for name, resource in self.resources.items():
             pg.draw.rect(screen, (200, 215, 227), (x, y, side, side))
-            if pg.key.get_pressed()[resource[2]]:
+            if pg.key.get_pressed()[keys[full]]:
                 self.lighting(screen, x, y, side)
             if resource[3] != 0:
                 screen.blit(resource[1], (x + side / 2 - 18, y + side / 2 - 18))
@@ -87,17 +87,16 @@ class Inventory(visual.DrawableObject):
         step = 150
 
         pg.draw.rect(screen, (182, 195, 206), (x - 30, y - 30, 630, 330))
-        pg.draw.rect(screen, (255, 0, 0), (x - 30 + step*4, y - 30, 30, 30))
+        screen.blit(cross, (x - 30 + step*4, y - 30, 30, 30))
 
         for name, resource in self.resources.items():
             pg.draw.rect(screen, (200, 215, 227), (x, y, side, side))
-            if pg.key.get_pressed()[resource[2]]:
+            if pg.key.get_pressed()[keys[full]]:
                 self.lighting(screen, x, y, side)
             if resource[3] != 0:
                 screen.blit(resource[1], (x + side / 2 - 18, y + side / 2 - 50))
-                self.print_text(str(resource[4]), x + side / 2 - 50, y + side / 2)
-                self.print_text('Amount: ' + str(resource[3]), x + side / 2 - 50, y + side / 2 + 15)
-                self.print_text('Key: ' + str(resource[0]), x + side / 2 - 50, y + side / 2 + 30)
+                self.print_text(str(resource[4]), x + side / 2 - 50, y + side / 2 + 10)
+                self.print_text('Amount: ' + str(resource[3]), x + side / 2 - 50, y + side / 2 + 30)
             x += step
             if x == (screen_width - 630) / 2 + 30 + 4*150:
                 x = (screen_width - 630) / 2 + 30
