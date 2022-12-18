@@ -7,14 +7,33 @@ from block import Block
 import random
 from matplotlib import pyplot as plt
 import time
+import pickle
 
 
 class World:
-    def __init__(self, seed):
-        self.seed = seed
+    def __init__(self, seed=None, file_name=None):
         self.map = []
         self.vx = 0
         self.vy = 0
+        self.seed = seed
+        if seed is None:
+            self.load_world(file_name)
+        else:
+            self.create_new_world()
+
+    def load_world(self, name: str):
+        file = open(f'saves/{name}', 'rb')
+        map_converted = pickle.load(file)[0].pickled_map
+        for i in range(len(map_converted)):
+            self.map.append([])
+            for j in range(len(map_converted[i])):
+                self.map[i].append([])
+                for k in range(len(map_converted[i][j])):
+                    self.map[i][j].append(
+                        Block(map_converted[i][j][k].x, map_converted[i][j][k].y, map_converted[i][j][k].type))
+        file.close()
+
+    def create_new_world(self):
         self.__init_sky()
         self.__init_landscape()
         self.__init_stone()
@@ -92,12 +111,12 @@ class World:
                     for i in range(1, len(noises)):
                         value += noises[i]([0, y / world_size_y, 1 - x / chunk_size]) * coefficient_arr[i]
                     perlin_map[3][y].append(value)
-            fig, (ax1, ax2, ax3, ax4) = plt.subplots(4)
-            ax1.imshow(perlin_map[0], cmap='gray')
-            ax2.imshow(perlin_map[1], cmap='gray')
-            ax3.imshow(perlin_map[2], cmap='gray')
-            ax4.imshow(perlin_map[3], cmap='gray')
-            plt.show()
+            # fig, (ax1, ax2, ax3, ax4) = plt.subplots(4)
+            # ax1.imshow(perlin_map[0], cmap='gray')
+            # ax2.imshow(perlin_map[1], cmap='gray')
+            # ax3.imshow(perlin_map[2], cmap='gray')
+            # ax4.imshow(perlin_map[3], cmap='gray')
+            # plt.show()
         return perlin_map
 
     def __build_tree(self, chunk, bot_x, bot_y, height):
@@ -107,7 +126,7 @@ class World:
         self.map[chunk][bot_y][bot_x] = Block(self.map[chunk][bot_y][bot_x].x, self.map[chunk][bot_y][bot_x].y,
                                               BlockType.tree_bottom)
         for i in range(1, height):
-            self.replace_block(chunk, bot_x, bot_y - i, BlockType.tree_middle)
+            self.__replace_block(chunk, bot_x, bot_y - i, BlockType.tree_middle)
         for y in range(3):
             for x in range(3):
                 c = chunk
@@ -119,7 +138,7 @@ class World:
                     c += 1
                     nx -= chunk_size
                     if c == chunk_num: c = 0
-                self.replace_block(c, nx, bot_y - height - y, leaves[y][x])
+                self.__replace_block(c, nx, bot_y - height - y, leaves[y][x])
 
     def __init_caves(self):
 
@@ -132,7 +151,7 @@ class World:
                     if self.map[z][y][x].type == BlockType.grass: grass_y = y
                     if grass_y is not None and y >= grass_y:
                         value = abs(caves[z][y][x])
-                        if value * caves_frequency * 18 <= 1:
+                        if value * caves_frequency * 20 <= 1:
                             self.map[z][y][x] = Block(self.map[z][y][x].x, self.map[z][y][x].y,
                                                       block_bg[self.map[z][y][x].type])
 
@@ -187,7 +206,7 @@ class World:
                                 self.__build_tree(z, x, y - 1, height)
                         if random.random() >= 0.8 / decorations_frequency and self.map[z][y - 1][
                             x].type == BlockType.sky:
-                            self.replace_block(z, x, y - 1,
+                            self.__replace_block(z, x, y - 1,
                                                decorations_surface[random.randint(0, len(decorations_surface) - 1)])
 
     def __init_underground_filling(self):
@@ -198,7 +217,7 @@ class World:
                     if self.map[z][y][x].type == BlockType.bg_stone:
                         if random.random() >= 0.8 / decorations_frequency and self.map[z][y + 1][
                             x].type == BlockType.stone:
-                            self.replace_block(z, x, y,
+                            self.__replace_block(z, x, y,
                                                decorations_underground[
                                                    random.randint(0, len(decorations_underground) - 1)])
 
@@ -249,8 +268,9 @@ class World:
                         if visual.is_block_on_screen(self.map[chunk][y][x]):
                             if self.map[chunk][y][x].rect.collidepoint((point_x, point_y)):
                                 return chunk, x, y
+        return None, None, None
 
-    def replace_block(self, chunk, old_block_x, old_block_y, new_type):
+    def __replace_block(self, chunk, old_block_x, old_block_y, new_type):
         self.map[chunk][old_block_y][old_block_x] = Block(self.map[chunk][old_block_y][old_block_x].x,
                                                           self.map[chunk][old_block_y][old_block_x].y, new_type)
 
@@ -284,7 +304,10 @@ class World:
         return False
 
     def remove_block(self, chunk, x, y):
-        self.replace_block(chunk, x, y, block_bg[self.map[chunk][y][x].type])
+        self.__replace_block(chunk, x, y, block_bg[self.map[chunk][y][x].type])
+
+    def place_block(self, chunk, x, y, new_type):
+        self.__replace_block(chunk, x, y, new_type)
 
     def move_right_chunk_to_left(self):
         for row in self.map[-1]:
