@@ -100,7 +100,7 @@ class Game:
     def build_block(self, chunk, x, y):
         block = self.world.map[chunk][y][x]
         if block.type == BlockType.sky or block.type == BlockType.bg_stone or block.type == BlockType.bg_dirt:
-            if (block.x >= self.hero.x + 0.75*hero_width or self.hero.x - 0.75*hero_width >= block.x)\
+             if (block.x >= self.hero.x + 0.75*hero_width or self.hero.x - 0.75*hero_width >= block.x)\
                     or (block.y >= self.hero.y + 0.75*hero_height or self.hero.y - 0.75*hero_height >= block.y):
                 if self.hero.selected_item_type is not None and self.hero.selected_item_type in self.inventory.resources:
                     if (block.x - self.hero.x) ** 2 + (block.y - self.hero.y) ** 2 <= hero_dig_range ** 2:
@@ -293,7 +293,8 @@ class Game:
 
         for i in range(len(keys)):
             if pg.key.get_pressed()[keys[i]]:
-                self.hero.selected_item_type = self.inventory.resources[list(self.inventory.resources.keys())[i]][0]
+                if len(self.inventory.resources) >= i + 1:
+                    self.hero.selected_item_type = list(self.inventory.resources.keys())[i]
 
         if self.game_status == GameStatus.in_game and pg.mouse.get_pressed()[0]:
             chunk, destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])
