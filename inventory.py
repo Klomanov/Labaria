@@ -1,25 +1,34 @@
 import pygame as pg
 import pygame.mouse
-
+import pickle
 import visual
 from constants import *
 
 
 class Resource:
 
-    def __init__(self, name):
+    def __init__(self, name, amount=0):
         self.surname = resource_surnames[name]
         self.image = resource_images[name]
-        self.amount = 0
+        self.amount = amount
 
 
 class Inventory(visual.DrawableObject):
 
-    def __init__(self, screen):
+    def __init__(self, screen, name=None):
         self.screen = screen
         self.resources = {}
+        if name is not None:
+            self.load_resources(name)
         self.panel = 4
         self.flag = False
+
+    def load_resources(self, name):
+        file = open(f'saves/{name}', 'rb')
+        resources = pickle.load(file)[1]
+        for name, resource in resources.items():
+            self.resources[name] = Resource(name, resource[1])
+        file.close()
 
     def add_resource(self, name):
         self.resources[name] = Resource(name)
@@ -39,7 +48,7 @@ class Inventory(visual.DrawableObject):
             self.delete_resource(name)
 
     def print_text(self, amount, x, y):
-        f = pg.font.Font(None, font_size)
+        f = pg.font.Font('DePixel/DePixelBreit.ttf', font_size)
         f = f.render(amount, True, (180, 0, 0))
         self.screen.blit(f, (x, y))
 
@@ -121,3 +130,22 @@ class Inventory(visual.DrawableObject):
                 self.flag = False
 
 
+def inventory_main():
+    """Рисует инвентарь, добавляет один блок земли. Инвентарь можно открыть."""
+    pg.font.init()
+    screen = pygame.display.set_mode((1200, 800))
+    pygame.display.set_caption('Inventory')
+    inventory = Inventory(screen)
+    inventory.increase(BlockType.dirt)
+    run = True
+    while run:
+        screen.fill((0, 0, 0))
+        inventory.draw_on(screen)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        pygame.display.update()
+
+
+if __name__ == "__main__":
+    inventory_main()

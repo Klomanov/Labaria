@@ -25,6 +25,6 @@ class PickledInventory:
     def __init__(self, resources):
         self.resources = {}
         for name, resource in resources.items():
-            self.resources[name] = [name, resource[3]]
+            self.resources[name] = [name, resource.amount]
 
 
