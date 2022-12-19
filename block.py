@@ -28,3 +28,26 @@ class Block(visual.DrawableObject):
         """
         self.image.set_alpha(255 - degree*255)
 
+
+def block_main():
+    """Рисует все блоки"""
+    screen = pg.display.set_mode((1200, 800))
+    pg.display.set_caption('Block')
+    blocks = []
+    k = 28 #Количество типов блоков
+    j = (screen_width - block_size*(k-1) - 10*(k-1))/2
+    for i in range(28):
+        blocks.append(Block(j, screen_height/2 - block_size, i))
+        j += 10 + block_size
+    run = True
+    for block in blocks:
+        block.draw_on(screen)
+    pg.display.update()
+    while run:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                run = False
+
+
+if __name__ == "__main__":
+    block_main()

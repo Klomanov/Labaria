@@ -3,7 +3,7 @@ import pygame as pg
 block_size = 30
 screen_height = 800
 screen_width = 1200
-font_size = 24
+font_size = 16
 
 g = 1  # ускорение свободного падения
 

@@ -190,7 +190,7 @@ class Game:
                 if event.key == pg.K_BACKSPACE and len(text) > 0:
                     text = text[:-1]
                 elif event.key == pg.K_RETURN:
-                    if text in self.files and text != self.search_oldest_file():
+                    if text in self.files and (text != self.search_oldest_file() or len(self.files) < 3):
                         text += '(1)'
                         if text in self.files:
                             text = text[:-3]
@@ -286,8 +286,10 @@ class Game:
                 if chunk is not None:
                     self.build_block(chunk, place_x, place_y)
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
+                if event.key == pg.K_ESCAPE and not self.inventory.flag:
                     self.game_status = GameStatus.in_pause
+                elif event.key == pg.K_ESCAPE and self.inventory.flag:
+                    self.inventory.flag = False
 
         for i in range(len(keys)):
             if pg.key.get_pressed()[keys[i]]:

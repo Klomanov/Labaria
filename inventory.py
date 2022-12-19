@@ -45,7 +45,7 @@ class Inventory(visual.DrawableObject):
             self.delete_resource(name)
 
     def print_text(self, amount, x, y):
-        f = pg.font.Font(None, font_size)
+        f = pg.font.Font('DePixel/DePixelBreit.ttf', font_size)
         f = f.render(amount, True, (180, 0, 0))
         self.screen.blit(f, (x, y))
 
@@ -126,3 +126,26 @@ class Inventory(visual.DrawableObject):
             pos = pygame.mouse.get_pos()
             if (pos[0] > 885) and (pos[0] < 915) and (pos[1] > 200) and (pos[1] < 230) and self.flag:
                 self.flag = False
+
+
+def inventory_main():
+    """Рисует инвентарь, добавляет один блок земли. Инвентарь можно открыть."""
+    pg.font.init()
+    screen = pygame.display.set_mode((1200, 800))
+    pygame.display.set_caption('Inventory')
+    inventory = Inventory(screen)
+    inventory.increase(BlockType.dirt)
+    run = True
+    while run:
+        screen.fill((0, 0, 0))
+        inventory.draw_on(screen)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        pygame.display.update()
+
+
+if __name__ == "__main__":
+    inventory_main()
+
+

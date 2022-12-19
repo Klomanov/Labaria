@@ -42,3 +42,35 @@ class Hero(visual.DrawableObject):
             self.animCount += 1
 
         screen.blit(self.image, self.rect)
+
+
+def hero_main():
+    """Рисует героя в пустоте."""
+    screen = pg.display.set_mode((1200, 800))
+    pg.display.set_caption('Hero')
+    hero = Hero(screen_width/2, screen_height/2)
+    run = True
+    vx = 0
+    while run:
+        screen.fill((100, 249, 255))
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                run = False
+            keys = pg.key.get_pressed()
+            if keys[pg.K_a]:
+                vx = hero_speed
+            if keys[pg.K_d]:
+                vx = -hero_speed
+            if not keys[pg.K_a] and not keys[pg.K_d]:
+                vx = 0
+            if keys[pg.K_SPACE]:
+                hero.falling = True
+            if keys[pg.K_s]:
+                hero.falling = False
+        hero.set_animation(vx)
+        hero.draw_on(screen)
+        pg.display.update()
+
+
+if __name__ == "__main__":
+    hero_main()
