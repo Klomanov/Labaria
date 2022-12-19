@@ -335,18 +335,18 @@ def world_main():
             for block in row:
                 block.y -= 350
     run = True
+    screen.fill((0, 0, 0))
+    for chunk in world.map:
+        if visual.is_chunk_on_screen(chunk):
+            for row in chunk:
+                for block in row:
+                    if visual.is_block_on_screen(block):
+                        block.draw_on(screen)
+    pg.display.update()
     while run:
-        screen.fill((0, 0, 0))
-        for chunk in world.map:
-            if visual.is_chunk_on_screen(chunk):
-                for row in chunk:
-                    for block in row:
-                        if visual.is_block_on_screen(block):
-                            block.draw_on(screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        pg.display.update()
 
 
 if __name__ == "__main__":
