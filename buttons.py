@@ -46,7 +46,7 @@ class Button(visual.DrawableObject):
 
 
 def button_main():
-    """Функция для тестирования"""
+    """Функция для тестирования. Рисует кнопки, тестирует также ввод с клавиатуры"""
     pg.font.init()
     font = pg.font.Font('DePixel/DePixelBreit.ttf', 60)
     f1 = font.render('Enter save name:', False, (0, 0, 0))
@@ -55,7 +55,7 @@ def button_main():
     enter_row = pygame.transform.scale(enter_row_img, (700, 100))
     LABaria = pygame.transform.scale(LABaria_pict, (1200, 800))
     start_button = Button(350, 200, 1, 'Start')
-    load_save_button = Button(350, 400, 1, 'Load save')
+    load_save_button = Button(350, 400, 1, 'Save game')
     exit_button = Button(350, 600, 1, 'Exit')
     screen = pygame.display.set_mode((1200, 800))
     pygame.display.set_caption('Buttons')
@@ -77,9 +77,12 @@ def button_main():
                 run = False
             if load_save_button.collide():
                 test = 'test'
+                txt_button.clicked = True
+                pickle_button.clicked = True
             if not pygame.mouse.get_pressed()[0]:
                 start_button.clicked = False
                 load_save_button.clicked = False
+                exit_button.clicked = False
         if test == 'test':
             txt_button.draw_on(screen)
             pickle_button.draw_on(screen)
@@ -89,17 +92,15 @@ def button_main():
             if pickle_button.collide():
                 save_type = 'pickle'
                 test = 'save'
+            if not pygame.mouse.get_pressed()[0]:
+                txt_button.clicked = False
+                pickle_button.clicked = False
             for event in pygame.event.get():
                 if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                     test = 'menu'
                 if event.type == pygame.QUIT:
                     run = False
         if test == 'save':
-            for event in pygame.event.get():
-                if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-                    test = 'menu'
-                if event.type == pygame.QUIT:
-                    run = False
             screen.blit(f1, (x_pos, 250))
             screen.blit(enter_row, (250, 400))
             for event in pygame.event.get():
@@ -107,6 +108,7 @@ def button_main():
                     run = False
                 elif event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                     test = 'test'
+                    text = ''
                 elif event.type == pg.KEYDOWN:
                     if event.key == pg.K_BACKSPACE and len(text) > 0:
                         text = text[:-1]
