@@ -22,6 +22,7 @@ class World:
             self.create_new_world()
 
     def load_world(self, name: str):
+        """Скачивает мир из файла"""
         file = open(f'saves/{name}', 'rb')
         map_converted = pickle.load(file)[0].pickled_map
         for i in range(len(map_converted)):
@@ -282,8 +283,6 @@ class World:
                     block.y += round(vy)
                     block.x += round(vx)
 
-
-
     def will_collide_with_rect(self, vx, vy, rect):
         """
         Проверяет столкновение мира с объектом через фрейм c заданной скоростью
@@ -324,3 +323,31 @@ class World:
         c = self.map[0]
         self.map.pop(0)
         self.map.insert(chunk_num - 1, c)
+
+
+def world_main():
+    """Генерирует мир без инвентаря и игрока"""
+    screen = pygame.display.set_mode((1200, 800))
+    pygame.display.set_caption('World')
+    world = World(-1)
+    for chunk in world.map:
+        for row in chunk:
+            for block in row:
+                block.y -= 350
+    run = True
+    screen.fill((0, 0, 0))
+    for chunk in world.map:
+        if visual.is_chunk_on_screen(chunk):
+            for row in chunk:
+                for block in row:
+                    if visual.is_block_on_screen(block):
+                        block.draw_on(screen)
+    pg.display.update()
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+
+if __name__ == "__main__":
+    world_main()

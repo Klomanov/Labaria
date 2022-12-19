@@ -100,7 +100,7 @@ class Game:
     def build_block(self, chunk, x, y):
         block = self.world.map[chunk][y][x]
         if block.type == BlockType.sky or block.type == BlockType.bg_stone or block.type == BlockType.bg_dirt:
-            if (block.x >= self.hero.x + 0.75*hero_width or self.hero.x - 0.75*hero_width >= block.x)\
+             if (block.x >= self.hero.x + 0.75*hero_width or self.hero.x - 0.75*hero_width >= block.x)\
                     or (block.y >= self.hero.y + 0.75*hero_height or self.hero.y - 0.75*hero_height >= block.y):
                 if self.hero.selected_item_type is not None and self.hero.selected_item_type in self.inventory.resources:
                     if (block.x - self.hero.x) ** 2 + (block.y - self.hero.y) ** 2 <= hero_dig_range ** 2:
@@ -111,25 +111,27 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.finished = True
-            if event.type == pg.MOUSEMOTION and self.exit_button.clicked:
+            if not pg.mouse.get_pressed()[0] and self.exit_button.clicked:
                 self.exit_button.clicked = False
+                self.start_button.clicked = False
+                self.load_save_button.clicked = False
         self.back_to_main_menu_button.clicked = False
         self.screen.blit(self.background, (0, 0))
         self.start_button.draw_on(self.screen)
         self.exit_button.draw_on(self.screen)
         self.load_save_button.draw_on(self.screen)
-        if self.start_button.collide(self.screen):
+        if self.start_button.collide():
             self.game_status = GameStatus.in_game
             self.world = World(seed=-1)
             self.hero = Hero(screen_width//2, screen_height//2)
             self.world.move(-world_size_x//3*block_size, 0)
             self.inventory = Inventory(self.screen)
-        if self.exit_button.collide(self.screen):
+        if self.exit_button.collide():
             self.finished = True
-        if self.load_save_button.collide(self.screen):
+        if self.load_save_button.collide():
             self.game_status = GameStatus.in_saves
-            if len(self.saves) > 1:
-                self.saves[1].clicked = True
+            for save in self.saves:
+                save.clicked = True
             self.load_save_button.clicked = False
         pygame.display.update()
 
@@ -147,14 +149,16 @@ class Game:
             self.screen.blit(back1, (0, 0))
             self.need_to_blit = False
         self.back_button.draw_on(self.screen)
-        if self.back_button.collide(self.screen):
+        if self.back_button.collide():
             self.game_status = GameStatus.in_game
         self.back_to_main_menu_button.draw_on(self.screen)
-        if self.back_to_main_menu_button.collide(self.screen):
+        if self.back_to_main_menu_button.collide():
             self.game_status = GameStatus.in_main_menu
             self.exit_button.clicked = True
+            self.load_save_button.clicked = True
+            self.start_button.clicked = True
         self.save_game_button.draw_on(self.screen)
-        if self.save_game_button.collide(self.screen):
+        if self.save_game_button.collide():
             self.need_to_blit = True
             self.drawer.update_screen(self.world.map, self.hero, self.inventory)
             self.game_status = GameStatus.in_enter_save
@@ -165,7 +169,6 @@ class Game:
         self.save_game_button.clicked = False
         font = pg.font.Font('DePixel/DePixelBreit.ttf', 60)
         f1 = font.render('Enter save name:', False, (0, 0, 0))
-        f2 = font.render('This name is already taken.', False, (0, 0, 0))
         x_pos = 600 - f1.get_width() / 2
         y_pos = 400 + (100 - f1.get_height()) / 2
         if self.need_to_blit:
@@ -187,6 +190,13 @@ class Game:
                 if event.key == pg.K_BACKSPACE and len(text) > 0:
                     text = text[:-1]
                 elif event.key == pg.K_RETURN:
+                    if text in self.files and (text != self.search_oldest_file() or len(self.files) < 3):
+                        text += '(1)'
+                        if text in self.files:
+                            text = text[:-3]
+                            text += '(2)'
+                            if text in self.files:
+                                text = text[:-3]
                     self.save_game(text)
                     self.game_status = GameStatus.in_pause
                     self.drawer.update_screen(self.world.map, self.hero, self.inventory)
@@ -207,6 +217,22 @@ class Game:
             self.saves.append(Button(350, i, 1, file))
             i += 200
             j += 1
+        if len(os.listdir('saves')) > 3: #удаляет самый старый файл
+            oldest_file_path = self.search_oldest_file()
+            if os.path.isfile(f'saves/{oldest_file_path}'):
+                os.remove(f'saves/{oldest_file_path}')
+
+    def search_oldest_file(self):
+        min_time = None
+        min_time_path = ''
+        for file in self.files:
+            if min_time is None:
+                min_time = os.path.getmtime(f'saves/{file}')
+                min_time_path = file
+            elif os.path.getmtime(f'saves/{file}') < min_time:
+                min_time = os.path.getmtime(f'saves/{file}')
+                min_time_path = file
+        return min_time_path
 
     def in_saves_activity(self):
         for event in pg.event.get():
@@ -214,9 +240,9 @@ class Game:
                 self.finished = True
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 self.game_status = GameStatus.in_main_menu
-            if event.type == pg.MOUSEMOTION:
-                if len(self.saves) > 1:
-                    self.saves[1].clicked = False
+            if not pg.mouse.get_pressed()[0]:
+                for save in self.saves:
+                    save.clicked = False
         self.save_game_button.clicked = False
         self.back_to_main_menu_button.clicked = False
         self.screen.blit(self.background, (0, 0))
@@ -224,7 +250,7 @@ class Game:
         for k in range(len(self.saves)):
             self.saves[k].draw_on(self.screen)
             i += 200
-            if self.saves[k].collide(self.screen):
+            if self.saves[k].collide():
                 self.download_game(self.files[k])
                 self.game_status = GameStatus.in_game
         pygame.display.update()
@@ -239,6 +265,7 @@ class Game:
             pickled_inventory = PickledInventory(self.inventory.resources)
             pickled_file.append(pickled_inventory.resources)
             pickle.dump(pickled_file, file)
+
         finally:
             file.close()
 
@@ -259,12 +286,15 @@ class Game:
                 if chunk is not None:
                     self.build_block(chunk, place_x, place_y)
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
+                if event.key == pg.K_ESCAPE and not self.inventory.flag:
                     self.game_status = GameStatus.in_pause
+                elif event.key == pg.K_ESCAPE and self.inventory.flag:
+                    self.inventory.flag = False
 
         for i in range(len(keys)):
             if pg.key.get_pressed()[keys[i]]:
-                self.hero.selected_item_type = self.inventory.resources[list(self.inventory.resources.keys())[i]][0]
+                if len(self.inventory.resources) >= i + 1:
+                    self.hero.selected_item_type = list(self.inventory.resources.keys())[i]
 
         if self.game_status == GameStatus.in_game and pg.mouse.get_pressed()[0]:
             chunk, destroy_x, destroy_y = self.world.get_block(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1])

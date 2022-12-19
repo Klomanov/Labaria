@@ -10,7 +10,6 @@ class PickledBlock:
 
 class PickledWorld:
     def __init__(self, map):
-
         self.pickled_map = []
         for i in range(len(map)):
             self.pickled_map.append([])
