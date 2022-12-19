@@ -31,12 +31,13 @@ class Button(visual.DrawableObject):
             y_pos = self.rect.y + (self.button_height - self.f1.render(self.text, False, (0, 0, 0)).get_height())/2
             surface.blit(self.f1.render(self.text, False, (0, 0, 0)), (left_pos, y_pos))
 
-    def collide(self, surface):
+    def collide(self):
+        """Проверяет нажатие кнопки"""
         action = False
         pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(pos):
             self.collided = True
-            if pygame.mouse.get_pressed()[0] and not self.clicked:
+            if pg.mouse.get_pressed()[0] and not self.clicked:
                 self.clicked = True
                 action = True
         if not self.rect.collidepoint(pos):
@@ -70,11 +71,11 @@ def button_main():
             start_button.draw_on(screen)
             exit_button.draw_on(screen)
             load_save_button.draw_on(screen)
-            if start_button.collide(screen):
+            if start_button.collide():
                 print("Перерыв на обед.")
-            if exit_button.collide(screen):
+            if exit_button.collide():
                 run = False
-            if load_save_button.collide(screen):
+            if load_save_button.collide():
                 test = 'test'
             if not pygame.mouse.get_pressed()[0]:
                 start_button.clicked = False
@@ -82,18 +83,23 @@ def button_main():
         if test == 'test':
             txt_button.draw_on(screen)
             pickle_button.draw_on(screen)
+            if txt_button.collide():
+                save_type = '.txt'
+                test = 'save'
+            if pickle_button.collide():
+                save_type = 'pickle'
+                test = 'save'
             for event in pygame.event.get():
                 if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                     test = 'menu'
                 if event.type == pygame.QUIT:
                     run = False
-            if txt_button.collide(screen):
-                save_type = '.txt'
-                test = 'save'
-            if pickle_button.collide(screen):
-                save_type = 'pickle'
-                test = 'save'
         if test == 'save':
+            for event in pygame.event.get():
+                if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                    test = 'menu'
+                if event.type == pygame.QUIT:
+                    run = False
             screen.blit(f1, (x_pos, 250))
             screen.blit(enter_row, (250, 400))
             for event in pygame.event.get():
